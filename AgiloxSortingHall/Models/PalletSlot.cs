@@ -16,11 +16,7 @@
         // Pořadí ve sloupci (0 = spodní level, pak nahoru)
         public int PositionIndex { get; set; }
 
-        // Co je to za artikl
-        public string Article { get; set; } = string.Empty;
-
         // Aktuální stav místa
         public PalletState State { get; set; } = PalletState.Empty;
     }
-
 }

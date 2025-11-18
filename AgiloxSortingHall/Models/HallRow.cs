@@ -13,6 +13,9 @@
         // Počet pozic v řadě (počet čtverečků ve sloupci)
         public int Capacity { get; set; }
 
+        // Např. "14124", "13134"
+        public string Article { get; set; } = string.Empty;
+
         // Navigační vlastnost – všechny palety v této řadě
         public ICollection<PalletSlot> Slots { get; set; } = new List<PalletSlot>();
     }

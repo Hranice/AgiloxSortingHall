@@ -3,75 +3,115 @@
 @model StulModel
 @{
     ViewData["Title"] = Model.Table.Name;
+
+    // Maximální počet pozic v řadě – využijeme pro výpočet výšky slotů v CSS
+    var maxCapacity = Model.Rows.Max(r => r.Capacity);
 }
 
-<h1>@Model.Table.Name</h1>
+<div class="container-fluid hall-page" style="--slot-count:@maxCapacity;">
 
-<!-- Wait dialog – jen jednoduchý box, pokud existuje PendingCall -->
-@if (Model.PendingCall != null)
-{
-    <div class="wait-dialog">
-        <p>Čekáte na řadu: @Model.PendingCall.HallRow.Name</p>
-        <form method="post" asp-page-handler="ConfirmDelivered">
-            <button type="submit">Doručeno</button>
-        </form>
-        <form method="post" asp-page-handler="CancelCall">
-            <button type="submit">Zrušit</button>
-        </form>
-    </div>
-}
-
-<div class="hall-grid">
-    <div class="row header-row">
-        @foreach (var row in Model.Rows)
-        {
-            <div class="col header-cell">@row.Name</div>
-        }
-    </div>
-
-    @{
-        var maxCapacity = Model.Rows.Max(r => r.Capacity);
-    }
-
-    @for (int pos = maxCapacity - 1; pos >= 0; pos--)
-    {
-        <div class="row">
-            @foreach (var row in Model.Rows)
-            {
-                var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
-                string cls = "slot empty";
-                string text = "";
-
-                if (slot != null && slot.State != PalletState.Empty)
-                {
-                    cls = "slot occupied";
-                    text = slot.Article;
-                }
-
-                <div class="col">
-                    <div class="@cls" style="border-color:@row.ColorHex">
-                        @text
-                    </div>
-                </div>
-            }
+    <!-- Hlavička stránky -->
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center my-3">
+            <h1 class="mb-0">@Model.Table.Name</h1>
+            <a asp-page="/Index" class="btn btn-outline-secondary btn-sm">Zpět</a>
         </div>
-    }
+    </div>
 
-    <!-- Spodní řada – tlačítka CALL (max 1 aktivní, pokud je PendingCall) -->
-    <div class="row bottom-row">
-        @foreach (var row in Model.Rows)
-        {
-            <div class="col">
-                <form method="post" asp-page-handler="CallRow">
-                    <input type="hidden" name="id" value="@Model.Table.Id" />
-                    <input type="hidden" name="rowId" value="@row.Id" />
+    @if (Model.PendingCall != null)
+    {
+        var call = Model.PendingCall;
+        var rowName = call.HallRow?.Name ?? "(neznámá řada)";
+        var article = call.HallRow?.Article;
+
+        <!-- Full-screen "čekám" obrazovka -->
+        <div class="hall-wait d-flex flex-column justify-content-center align-items-center">
+            <div class="text-center mb-4">
+                <h2 class="mb-3">Čeká na doručení</h2>
+
+                <p class="fs-4 mb-1">
+                    Řada: <strong>@rowName</strong>
+                </p>
+
+                @if (!string.IsNullOrWhiteSpace(article))
+                {
+                    <p class="fs-4">
+                        Artikl: <strong>@article</strong>
+                    </p>
+                }
+                else
+                {
+                    <p class="fs-5 text-muted">
+                        (Název artiklu pro tuto řadu není nastaven.)
+                    </p>
+                }
+            </div>
+
+            <div class="d-flex flex-column gap-3 w-100" style="max-width: 400px;">
+                <form method="post" asp-page-handler="ConfirmDelivered">
                     <button type="submit"
-                    @(Model.PendingCall != null ? "disabled" : "")
-                            class="btn-call">
-                        +1
+                            class="btn btn-success btn-lg w-100 py-3">
+                        ✅ Doručeno
+                    </button>
+                </form>
+
+                <form method="post" asp-page-handler="CancelCall">
+                    <button type="submit"
+                            class="btn btn-outline-danger btn-lg w-100 py-3">
+                        ❌ Zrušit požadavek
                     </button>
                 </form>
             </div>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        bool hasPending = Model.PendingCall != null; // tady bude false, ale necháme pro případné rozšíření
+
+        <!-- Stejná mřížka sloupců jako u skladníka -->
+        <div class="hall-columns-container">
+
+            @foreach (var row in Model.Rows)
+            {
+                var isDisabled = hasPending;
+
+                <!-- Jeden sloupec = jeden form, celý sloupec je klikací -->
+                <form method="post"
+                      asp-page-handler="CallRow"
+                      class="hall-column">
+                    <input type="hidden" name="id" value="@Model.Table.Id" />
+                    <input type="hidden" name="rowId" value="@row.Id" />
+
+                    <button type="submit"
+                            class="btn btn-outline-primary column-button w-100 p-2 @(isDisabled ? "disabled" : "")"
+                    @(isDisabled ? "disabled" : null)>
+
+                        <!-- Název řady -->
+                        <div class="header-cell text-center fw-bold mb-2">
+                            @row.Name
+                        </div>
+
+                        <!-- Sloty (čtverečky) -->
+                        @for (int pos = maxCapacity - 1; pos >= 0; pos--)
+                        {
+                            var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
+                            var cls = (slot != null && slot.State == PalletState.Occupied)
+                            ? "slot occupied"
+                            : "slot empty";
+
+                            <div class="slot-wrapper mb-1">
+                                <div class="@cls" style="border-color:@row.ColorHex"></div>
+                            </div>
+                        }
+
+                        <!-- Název artiklu -->
+                        <div class="article-label small text-muted text-center mt-1">
+                            @row.Article
+                        </div>
+                    </button>
+                </form>
+            }
+
+        </div>
+    }
 </div>

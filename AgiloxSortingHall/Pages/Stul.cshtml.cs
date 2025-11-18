@@ -1,7 +1,9 @@
 using AgiloxSortingHall.Data;
+using AgiloxSortingHall.Hubs;
 using AgiloxSortingHall.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace AgiloxSortingHall.Pages
@@ -10,11 +12,13 @@ namespace AgiloxSortingHall.Pages
     {
         private readonly AppDbContext _db;
         private readonly ILogger<StulModel> _logger;
+        private readonly IHubContext<HallHub> _hub;
 
-        public StulModel(ILogger<StulModel> logger, AppDbContext db)
+        public StulModel(ILogger<StulModel> logger, AppDbContext db, IHubContext<HallHub> hub)
         {
             _logger = logger;
             _db = db;
+            _hub = hub;
         }
 
         public WorkTable Table { get; set; } = null!;
@@ -59,6 +63,8 @@ namespace AgiloxSortingHall.Pages
                 };
                 _db.RowCalls.Add(call);
                 await _db.SaveChangesAsync();
+
+                await _hub.Clients.All.SendAsync("HallUpdated");
             }
 
             return RedirectToPage(new { id });
@@ -71,14 +77,29 @@ namespace AgiloxSortingHall.Pages
                 .OrderByDescending(c => c.RequestedAt)
                 .FirstOrDefaultAsync();
 
-            if (call != null)
+            if (call == null)
             {
-                call.Status = RowCallStatus.Delivered;
-                await _db.SaveChangesAsync();
+                return RedirectToPage(new { id });
             }
+
+            var bottomSlot = await _db.PalletSlots
+                .Where(s => s.HallRowId == call.HallRowId && s.State == PalletState.Occupied)
+                .OrderBy(s => s.PositionIndex)  // odspoda nahoru
+                .FirstOrDefaultAsync();
+
+            if (bottomSlot != null)
+            {
+                bottomSlot.State = PalletState.Empty;
+            }
+
+            call.Status = RowCallStatus.Delivered;
+
+            await _db.SaveChangesAsync();
+            await _hub.Clients.All.SendAsync("HallUpdated");
 
             return RedirectToPage(new { id });
         }
+
 
         public async Task<IActionResult> OnPostCancelCallAsync(int id)
         {

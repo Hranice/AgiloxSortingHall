@@ -1,67 +1,79 @@
 ﻿@page
 @using AgiloxSortingHall.Models
-@model SkladnikModel
+@model AgiloxSortingHall.Pages.SkladnikModel
 @{
     ViewData["Title"] = "Skladník";
+    var maxCapacity = Model.Rows.Max(r => r.Capacity);   // <<< přidáno sem
 }
-
-<h1>SKLADNÍK</h1>
-
-<div class="hall-grid">
-    <!-- Názvy řad (sloupců) -->
-    <div class="row header-row">
-        @foreach (var row in Model.Rows)
-        {
-            <div class="col header-cell">
-                @row.Name
-            </div>
-        }
+<div class="container-fluid hall-page" style="--slot-count:@maxCapacity;">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="my-3">Skladník</h1>
+        </div>
     </div>
 
-    <!-- Paletové pozice -->
-    @{
-        // předpoklad: všechny řady mají stejnou Capacity (když ne, vezmu max)
-        var maxCapacity = Model.Rows.Max(r => r.Capacity);
-    }
-
-    @for (int pos = maxCapacity - 1; pos >= 0; pos--) // shora dolů
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <div class="row">
-            @foreach (var row in Model.Rows)
-            {
-                var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
-
-                // určení CSS třídy podle zaplnění
-                string cls = "slot empty";
-                string text = "";
-                if (slot != null && slot.State != PalletState.Empty)
-                {
-                    cls = "slot occupied";
-                    text = slot.Article;
-                }
-
-                <div class="col">
-                    <div class="@cls" style="border-color:@row.ColorHex">
-                        @text
-                    </div>
+            <div class="col-12">
+                <div class="alert alert-danger py-2">
+                    @Model.ErrorMessage
                 </div>
-            }
+            </div>
         </div>
     }
 
-    <!-- Textová pole pro zadání artiklu a tlačítko +1 -->
-    <div class="row bottom-row">
+    <div class="hall-columns-container">
+
         @foreach (var row in Model.Rows)
         {
-            <div class="col">
-                <form method="post" asp-page-handler="AddPallet">
-                    <!-- Skryté pole pro identifikaci řady -->
+            <div class="hall-column">
+
+                <!-- Název řady -->
+                <div class="header-cell text-center fw-bold mb-2">
+                    @row.Name
+                </div>
+
+                <!-- Sloty (použijeme maxCapacity z hlavičky) -->
+                @for (int pos = maxCapacity - 1; pos >= 0; pos--)
+                {
+                    var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
+                    string cls = slot?.State == PalletState.Occupied ? "slot occupied" : "slot empty";
+
+                    <div class="slot-wrapper mb-1">
+                        <div class="@cls" style="border-color:@row.ColorHex"></div>
+                    </div>
+                }
+
+                <!-- Formulář + tlačítka -->
+                <form method="post" class="w-100 mt-2">
                     <input type="hidden" name="rowId" value="@row.Id" />
-                    <!-- TextBox pro číslo artiklu; model binder to dá do slovníku NewArticleForRow[row.Id] -->
-                    <input type="number" name="NewArticleForRow[@row.Id]" class="article-input" />
-                    <button type="submit" class="btn-plus">+1</button>
+
+                    <div class="input-group input-group-sm mb-1">
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Název artiklu"
+                               name="RowArticle[@row.Id]"
+                               value="@(Model.RowArticle[row.Id])" />
+                        <button class="btn btn-outline-primary"
+                                type="submit"
+                                asp-page-handler="SetArticle">
+                            💾
+                        </button>
+                    </div>
+
+                    <button class="btn btn-success btn-sm w-100"
+                            type="submit"
+                            asp-page-handler="AddPallet">
+                        +1
+                    </button>
                 </form>
+
+                <div class="small text-muted text-center mt-1">
+                    @row.Article
+                </div>
             </div>
         }
+
     </div>
 </div>

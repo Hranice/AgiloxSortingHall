@@ -30,49 +30,72 @@ body {
   text-align: start;
 }
 
-.hall-grid {
-    display: inline-block;
-}
-
-    .hall-grid .row {
-        display: flex;
-    }
-
-    .hall-grid .col {
-        margin: 4px;
-    }
-
-.header-cell {
-    text-align: center;
-    font-weight: bold;
-}
-
-.slot {
-    width: 80px;
-    height: 80px;
-    border: 3px solid #000;
-    box-sizing: border-box;
-}
-
-    .slot.empty {
-        background-color: white;
-    }
-
-    .slot.occupied {
-        /* mùeš pozdìji odstínit podle zaplnìní / stavu */
-        background-color: #d0e8ff;
-    }
-
-.bottom-row form {
+/* Celá stránka Skladník – flex sloupec na vıšku okna */
+.hall-page {
+    min-height: 100vh; /* zabírá celé okno */
     display: flex;
     flex-direction: column;
 }
 
-.article-input {
-    width: 80px;
-    margin-bottom: 4px;
+/* Kontejner se sloupci – zabere zbytek vıšky pod nadpisem/alertem */
+.hall-columns-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    overflow-x: auto; /* na mobilu horizontální scroll */
+    gap: 16px;
+    flex: 1 1 auto; /* a roste na vıšku */
+    padding-bottom: 8px;
 }
 
-.btn-plus {
-    width: 80px;
+/* Jeden sloupec */
+.hall-column {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 120px; /* default šíøka na mobilu */
+}
+
+/* VİPOÈET VİŠKY SLOTU
+   --slot-count nastavujeme v Razor: style="--slot-count: X;"
+   --vertical-reserved = kolik px si necháme na nadpisy, formuláøe, mezery
+*/
+.hall-page {
+    --slot-count: 5;
+    --vertical-reserved: 320px; /* jemné doladìní podle oka */
+    --slot-size: calc((100vh - var(--vertical-reserved)) / var(--slot-count));
+}
+
+/* Ètvereèky – pouívají vypoètenou velikost */
+.slot {
+    width: var(--slot-size);
+    height: var(--slot-size);
+    border: 3px solid;
+    box-sizing: border-box;
+}
+
+    .slot.empty {
+        background-color: #fff;
+    }
+
+    .slot.occupied {
+        background-color: #d0e8ff;
+    }
+
+/* Zarovnání slotu ve sloupci */
+.slot-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+/* Na vìtších obrazovkách roztáhnout sloupce pøes šíøku */
+@media (min-width: 992px) {
+    .hall-columns-container {
+        overflow-x: visible;
+        justify-content: space-evenly;
+    }
+
+    .hall-column {
+        flex: 1 1 0;
+        max-width: 180px;
+    }
 }
