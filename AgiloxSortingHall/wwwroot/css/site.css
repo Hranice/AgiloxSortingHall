@@ -29,3 +29,50 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.hall-grid {
+    display: inline-block;
+}
+
+    .hall-grid .row {
+        display: flex;
+    }
+
+    .hall-grid .col {
+        margin: 4px;
+    }
+
+.header-cell {
+    text-align: center;
+    font-weight: bold;
+}
+
+.slot {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #000;
+    box-sizing: border-box;
+}
+
+    .slot.empty {
+        background-color: white;
+    }
+
+    .slot.occupied {
+        /* mùžeš pozdìji odstínit podle zaplnìní / stavu */
+        background-color: #d0e8ff;
+    }
+
+.bottom-row form {
+    display: flex;
+    flex-direction: column;
+}
+
+.article-input {
+    width: 80px;
+    margin-bottom: 4px;
+}
+
+.btn-plus {
+    width: 80px;
+}

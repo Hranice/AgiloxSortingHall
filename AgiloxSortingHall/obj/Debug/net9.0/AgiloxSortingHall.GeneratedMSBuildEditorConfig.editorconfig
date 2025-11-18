@@ -1,11 +1,19 @@
 is_global = true
 build_property.TargetFramework = net9.0
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = AgiloxSortingHall
 build_property.RootNamespace = AgiloxSortingHall
@@ -34,6 +42,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/jprochazka/source/repos/AgiloxSortingHall/AgiloxSortingHall/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/jprochazka/source/repos/AgiloxSortingHall/AgiloxSortingHall/Pages/Skladnik.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2tsYWRuaWsuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/jprochazka/source/repos/AgiloxSortingHall/AgiloxSortingHall/Pages/Stul.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3R1bC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/jprochazka/source/repos/AgiloxSortingHall/AgiloxSortingHall/Pages/_ViewImports.cshtml]

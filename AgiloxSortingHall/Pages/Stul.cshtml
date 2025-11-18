@@ -1,0 +1,77 @@
+﻿@page "{id:int}"
+@using AgiloxSortingHall.Models
+@model StulModel
+@{
+    ViewData["Title"] = Model.Table.Name;
+}
+
+<h1>@Model.Table.Name</h1>
+
+<!-- Wait dialog – jen jednoduchý box, pokud existuje PendingCall -->
+@if (Model.PendingCall != null)
+{
+    <div class="wait-dialog">
+        <p>Čekáte na řadu: @Model.PendingCall.HallRow.Name</p>
+        <form method="post" asp-page-handler="ConfirmDelivered">
+            <button type="submit">Doručeno</button>
+        </form>
+        <form method="post" asp-page-handler="CancelCall">
+            <button type="submit">Zrušit</button>
+        </form>
+    </div>
+}
+
+<div class="hall-grid">
+    <div class="row header-row">
+        @foreach (var row in Model.Rows)
+        {
+            <div class="col header-cell">@row.Name</div>
+        }
+    </div>
+
+    @{
+        var maxCapacity = Model.Rows.Max(r => r.Capacity);
+    }
+
+    @for (int pos = maxCapacity - 1; pos >= 0; pos--)
+    {
+        <div class="row">
+            @foreach (var row in Model.Rows)
+            {
+                var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
+                string cls = "slot empty";
+                string text = "";
+
+                if (slot != null && slot.State != PalletState.Empty)
+                {
+                    cls = "slot occupied";
+                    text = slot.Article;
+                }
+
+                <div class="col">
+                    <div class="@cls" style="border-color:@row.ColorHex">
+                        @text
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Spodní řada – tlačítka CALL (max 1 aktivní, pokud je PendingCall) -->
+    <div class="row bottom-row">
+        @foreach (var row in Model.Rows)
+        {
+            <div class="col">
+                <form method="post" asp-page-handler="CallRow">
+                    <input type="hidden" name="id" value="@Model.Table.Id" />
+                    <input type="hidden" name="rowId" value="@row.Id" />
+                    <button type="submit"
+                    @(Model.PendingCall != null ? "disabled" : "")
+                            class="btn-call">
+                        +1
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

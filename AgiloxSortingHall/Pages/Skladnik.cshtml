@@ -1,0 +1,67 @@
+﻿@page
+@using AgiloxSortingHall.Models
+@model SkladnikModel
+@{
+    ViewData["Title"] = "Skladník";
+}
+
+<h1>SKLADNÍK</h1>
+
+<div class="hall-grid">
+    <!-- Názvy řad (sloupců) -->
+    <div class="row header-row">
+        @foreach (var row in Model.Rows)
+        {
+            <div class="col header-cell">
+                @row.Name
+            </div>
+        }
+    </div>
+
+    <!-- Paletové pozice -->
+    @{
+        // předpoklad: všechny řady mají stejnou Capacity (když ne, vezmu max)
+        var maxCapacity = Model.Rows.Max(r => r.Capacity);
+    }
+
+    @for (int pos = maxCapacity - 1; pos >= 0; pos--) // shora dolů
+    {
+        <div class="row">
+            @foreach (var row in Model.Rows)
+            {
+                var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
+
+                // určení CSS třídy podle zaplnění
+                string cls = "slot empty";
+                string text = "";
+                if (slot != null && slot.State != PalletState.Empty)
+                {
+                    cls = "slot occupied";
+                    text = slot.Article;
+                }
+
+                <div class="col">
+                    <div class="@cls" style="border-color:@row.ColorHex">
+                        @text
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Textová pole pro zadání artiklu a tlačítko +1 -->
+    <div class="row bottom-row">
+        @foreach (var row in Model.Rows)
+        {
+            <div class="col">
+                <form method="post" asp-page-handler="AddPallet">
+                    <!-- Skryté pole pro identifikaci řady -->
+                    <input type="hidden" name="rowId" value="@row.Id" />
+                    <!-- TextBox pro číslo artiklu; model binder to dá do slovníku NewArticleForRow[row.Id] -->
+                    <input type="number" name="NewArticleForRow[@row.Id]" class="article-input" />
+                    <button type="submit" class="btn-plus">+1</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
