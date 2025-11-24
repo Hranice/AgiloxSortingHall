@@ -5,6 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    // Naslouchat na všech IP (0.0.0.0) na portu 5044 – èisté HTTP
+//    options.ListenAnyIP(5044);
+
+//    options.ListenAnyIP(7002, listenOptions =>
+//    {
+//        listenOptions.UseHttps();
+//    });
+//});
+
+
 // DbContext s SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
