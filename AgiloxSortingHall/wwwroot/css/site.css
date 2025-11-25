@@ -1,4 +1,4 @@
-html {
+ï»¿html {
   font-size: 14px;
 }
 
@@ -30,21 +30,21 @@ body {
   text-align: start;
 }
 
-/* Celá stránka Skladník – flex sloupec na vıšku okna */
+/* CelÃ¡ strÃ¡nka SkladnÃ­k â€“ flex sloupec na vÃ½Å¡ku okna */
 .hall-page {
-    min-height: 100vh; /* zabírá celé okno */
+    min-height: 100vh; /* zabÃ­rÃ¡ celÃ© okno */
     display: flex;
     flex-direction: column;
 }
 
-/* Kontejner se sloupci – zabere zbytek vıšky pod nadpisem/alertem */
+/* Kontejner se sloupci â€“ zabere zbytek vÃ½Å¡ky pod nadpisem/alertem */
 .hall-columns-container {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    overflow-x: auto; /* na mobilu horizontální scroll */
+    overflow-x: auto; /* na mobilu horizontÃ¡lnÃ­ scroll */
     gap: 16px;
-    flex: 1 1 auto; /* a roste na vıšku */
+    flex: 1 1 auto; /* aÅ¥ roste na vÃ½Å¡ku */
     padding-bottom: 8px;
 }
 
@@ -52,20 +52,20 @@ body {
 .hall-column {
     display: flex;
     flex-direction: column;
-    flex: 0 0 120px; /* default šíøka na mobilu */
+    flex: 0 0 120px; /* default Å¡Ã­Å™ka na mobilu */
 }
 
-/* VİPOÈET VİŠKY SLOTU
+/* VÃPOÄŒET VÃÅ KY SLOTU
    --slot-count nastavujeme v Razor: style="--slot-count: X;"
-   --vertical-reserved = kolik px si necháme na nadpisy, formuláøe, mezery
+   --vertical-reserved = kolik px si nechÃ¡me na nadpisy, formulÃ¡Å™e, mezery
 */
 .hall-page {
     --slot-count: 5;
-    --vertical-reserved: 320px; /* jemné doladìní podle oka */
+    --vertical-reserved: 320px; /* jemnÃ© doladÄ›nÃ­ podle oka */
     --slot-size: calc((100vh - var(--vertical-reserved)) / var(--slot-count));
 }
 
-/* Ètvereèky – pouívají vypoètenou velikost */
+/* ÄŒtvereÄky â€“ pouÅ¾Ã­vajÃ­ vypoÄtenou velikost */
 .slot {
     width: var(--slot-size);
     height: var(--slot-size);
@@ -81,13 +81,13 @@ body {
         background-color: #d0e8ff;
     }
 
-/* Zarovnání slotu ve sloupci */
+/* ZarovnÃ¡nÃ­ slotu ve sloupci */
 .slot-wrapper {
     display: flex;
     justify-content: center;
 }
 
-/* Na vìtších obrazovkách roztáhnout sloupce pøes šíøku */
+/* Na vÄ›tÅ¡Ã­ch obrazovkÃ¡ch roztÃ¡hnout sloupce pÅ™es Å¡Ã­Å™ku */
 @media (min-width: 992px) {
     .hall-columns-container {
         overflow-x: visible;
@@ -98,4 +98,33 @@ body {
         flex: 1 1 0;
         max-width: 180px;
     }
+}
+
+
+/* Text uvnitÅ™ slotu (jmÃ©no stolu) */
+.slot-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 4px;
+    width: 100%;
+    height: 100%;
+}
+
+/* Fronta pod sloupcem */
+.queue-label {
+    min-height: 1.2rem; /* aby to nehopsalo, kdyÅ¾ fronta zmizÃ­/objevÃ­ se */
+}
+
+/* Jen kosmetika â€“ zvÃ½raznÄ›nÃ­ toho stolu, kterÃ½ prÃ¡vÄ› koukÃ¡ na svou strÃ¡nku */
+.slot-label::before {
+    /* nic â€“ jen placeholder, kdybys chtÄ›l tÅ™eba jinou barvu pro "â–¶ STÅ®L X" */
+}
+
+
+.slot.in-transit {
+    background-color: #f0f0f0;
+    border-style: dashed;
 }

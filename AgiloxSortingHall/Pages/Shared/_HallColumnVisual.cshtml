@@ -1,0 +1,96 @@
+﻿@using AgiloxSortingHall.Models
+@using AgiloxSortingHall.ViewModels
+@model HallColumnVisualModel
+
+@{
+    var row = Model.Row;
+    var maxCapacity = Model.MaxCapacity;
+
+    var rowQueue = Model.PendingCalls
+        .Where(c => c.HallRowId == row.Id && c.Status == RowCallStatus.Pending)
+        .OrderBy(c => c.RequestedAt)
+        .ToList();
+
+    var occupiedSlots = row.Slots
+        .Where(s => s.State == PalletState.Occupied)
+        .OrderBy(s => s.PositionIndex)
+        .ToList();
+
+    var labelBySlotId = new Dictionary<int, string>();
+    int idx = 0;
+    foreach (var slot in occupiedSlots)
+    {
+        if (idx >= rowQueue.Count) break;
+
+        var call = rowQueue[idx];
+        var tableName = call.WorkTable?.Name ?? $"Stůl {call.WorkTableId}";
+
+        if (Model.CurrentTableId.HasValue && call.WorkTableId == Model.CurrentTableId.Value)
+        {
+            tableName = $"▶ {tableName}";
+        }
+
+        labelBySlotId[slot.Id] = tableName;
+        idx++;
+    }
+
+    var remainingQueue = rowQueue.Skip(idx).ToList();
+}
+
+
+<!-- Název řady -->
+<div class="header-cell text-center fw-bold mb-2">
+    @row.Name
+</div>
+
+<!-- Sloty (čtverečky) -->
+@for (int pos = maxCapacity - 1; pos >= 0; pos--)
+{
+    var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
+
+    var cls = "slot empty";
+    string? label = null;
+
+    if (slot != null)
+    {
+        if (slot.State == PalletState.Occupied)
+        {
+            cls = "slot occupied";
+            if (labelBySlotId.TryGetValue(slot.Id, out var lbl))
+            {
+                label = lbl;
+            }
+        }
+        else if (slot.State == PalletState.InTransit)
+        {
+            cls = "slot in-transit";
+        }
+    }
+
+    <div class="slot-wrapper mb-1">
+        <div class="@cls" style="border-color:@row.ColorHex">
+            @if (!string.IsNullOrEmpty(label))
+            {
+                <div class="slot-label">
+                    @label
+                </div>
+            }
+        </div>
+    </div>
+}
+
+
+<!-- Název artiklu řady -->
+<div class="article-label small text-muted text-center mt-1">
+    @row.Article
+</div>
+
+<!-- Zbytek fronty pro tuto řadu -->
+@if (remainingQueue.Any())
+{
+    <div class="queue-label small text-muted text-center mt-1">
+        fronta:
+        @string.Join(", ",
+        remainingQueue.Select(c => c.WorkTable?.Name ?? $"Stůl {c.WorkTableId}"))
+</div>
+}

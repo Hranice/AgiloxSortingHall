@@ -27,6 +27,12 @@ namespace AgiloxSortingHall.Pages
         // Aktuální èekající call (pokud existuje)
         public RowCall? PendingCall { get; set; }
 
+        /// <summary>
+        /// Všechny pending call-y pro vizualizaci fronty na møížce.
+        /// </summary>
+        public List<RowCall> PendingCalls { get; set; } = new();
+
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Table = await _db.WorkTables.FindAsync(id)
@@ -42,6 +48,13 @@ namespace AgiloxSortingHall.Pages
                 .Where(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending)
                 .OrderByDescending(c => c.RequestedAt)
                 .FirstOrDefaultAsync();
+
+            PendingCalls = await _db.RowCalls
+            .Include(c => c.WorkTable)
+            .Where(c => c.Status == RowCallStatus.Pending)
+            .OrderBy(c => c.RequestedAt)
+            .ToListAsync();
+
 
             return Page();
         }
@@ -82,14 +95,33 @@ namespace AgiloxSortingHall.Pages
                 return RedirectToPage(new { id });
             }
 
-            var bottomSlot = await _db.PalletSlots
-                .Where(s => s.HallRowId == call.HallRowId && s.State == PalletState.Occupied)
-                .OrderBy(s => s.PositionIndex)  // odspoda nahoru
-                .FirstOrDefaultAsync();
+            var row = await _db.HallRows
+                .Include(r => r.Slots)
+                .FirstOrDefaultAsync(r => r.Id == call.HallRowId);
 
-            if (bottomSlot != null)
+            if (row != null)
             {
-                bottomSlot.State = PalletState.Empty;
+                var rowQueue = await _db.RowCalls
+                    .Where(c => c.HallRowId == row.Id && c.Status == RowCallStatus.Pending)
+                    .OrderBy(c => c.RequestedAt)
+                    .ToListAsync();
+
+                var occupiedSlots = row.Slots
+                    .Where(s => s.State == PalletState.Occupied)
+                    .OrderBy(s => s.PositionIndex)
+                    .ToList();
+
+                var callIndex = rowQueue.FindIndex(c => c.Id == call.Id);
+
+                // Pokud má tahle øada ménì palet než je poøadí callu,
+                // tahle konkrétní žádost zatím nemá "svou" fyzickou paletu.
+                // V takovém pøípadì fyzicky nic neodebíráme, jen oznaèíme call jako doruèený.
+                if (callIndex >= 0 && callIndex < occupiedSlots.Count)
+                {
+                    var assignedSlot = occupiedSlots[callIndex];
+
+                    assignedSlot.State = PalletState.Empty;
+                }
             }
 
             call.Status = RowCallStatus.Delivered;
@@ -99,6 +131,7 @@ namespace AgiloxSortingHall.Pages
 
             return RedirectToPage(new { id });
         }
+
 
 
         public async Task<IActionResult> OnPostCancelCallAsync(int id)

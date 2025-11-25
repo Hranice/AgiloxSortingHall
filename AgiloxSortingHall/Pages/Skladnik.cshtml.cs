@@ -28,6 +28,13 @@ namespace AgiloxSortingHall.Pages
         [BindProperty]
         public Dictionary<int, string?> RowArticle { get; set; } = new();
 
+        /// <summary>
+        /// Všechny pending požadavky z jednotlivých stolù,
+        /// používá se ve vizualizaci fronty.
+        /// </summary>
+        public List<RowCall> PendingCalls { get; set; } = new();
+
+
         [TempData]
         public string? ErrorMessage { get; set; }
 
@@ -42,6 +49,12 @@ namespace AgiloxSortingHall.Pages
             {
                 RowArticle[r.Id] = r.Article;
             }
+
+            PendingCalls = await _db.RowCalls
+                .Include(c => c.WorkTable)
+                .Where(c => c.Status == RowCallStatus.Pending)
+                .OrderBy(c => c.RequestedAt)
+                .ToListAsync();
         }
 
 

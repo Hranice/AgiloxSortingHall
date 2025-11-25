@@ -1,16 +1,14 @@
 ﻿@page "{id:int}"
 @using AgiloxSortingHall.Models
+@using AgiloxSortingHall.ViewModels
 @model StulModel
 @{
     ViewData["Title"] = Model.Table.Name;
-
-    // Maximální počet pozic v řadě – využijeme pro výpočet výšky slotů v CSS
     var maxCapacity = Model.Rows.Max(r => r.Capacity);
 }
 
 <div class="container-fluid hall-page" style="--slot-count:@maxCapacity;">
 
-    <!-- Hlavička stránky -->
     <div class="row">
         <div class="col-12 d-flex justify-content-between align-items-center my-3">
             <h1 class="mb-0">@Model.Table.Name</h1>
@@ -24,7 +22,6 @@
         var rowName = call.HallRow?.Name ?? "(neznámá řada)";
         var article = call.HallRow?.Article;
 
-        <!-- Full-screen "čekám" obrazovka -->
         <div class="hall-wait d-flex flex-column justify-content-center align-items-center">
             <div class="text-center mb-4">
                 <h2 class="mb-3">Čeká na doručení</h2>
@@ -35,82 +32,53 @@
 
                 @if (!string.IsNullOrWhiteSpace(article))
                 {
-                    <p class="fs-4">
-                        Artikl: <strong>@article</strong>
-                    </p>
+                    <p class="fs-4">Artikl: <strong>@article</strong></p>
                 }
                 else
                 {
-                    <p class="fs-5 text-muted">
-                        (Název artiklu pro tuto řadu není nastaven.)
-                    </p>
+                    <p class="fs-5 text-muted">(Název artiklu není nastaven.)</p>
                 }
             </div>
 
             <div class="d-flex flex-column gap-3 w-100" style="max-width: 400px;">
                 <form method="post" asp-page-handler="ConfirmDelivered">
-                    <button type="submit"
-                            class="btn btn-success btn-lg w-100 py-3">
-                        ✅ Doručeno
-                    </button>
+                    <button type="submit" class="btn btn-success btn-lg w-100 py-3">✅ Doručeno</button>
                 </form>
 
                 <form method="post" asp-page-handler="CancelCall">
-                    <button type="submit"
-                            class="btn btn-outline-danger btn-lg w-100 py-3">
-                        ❌ Zrušit požadavek
-                    </button>
+                    <button type="submit" class="btn btn-outline-danger btn-lg w-100 py-3">❌ Zrušit požadavek</button>
                 </form>
             </div>
         </div>
     }
     else
     {
-        bool hasPending = Model.PendingCall != null; // tady bude false, ale necháme pro případné rozšíření
-
-        <!-- Stejná mřížka sloupců jako u skladníka -->
         <div class="hall-columns-container">
 
             @foreach (var row in Model.Rows)
             {
-                var isDisabled = hasPending;
-
-                <!-- Jeden sloupec = jeden form, celý sloupec je klikací -->
                 <form method="post"
                       asp-page-handler="CallRow"
                       class="hall-column">
+
                     <input type="hidden" name="id" value="@Model.Table.Id" />
                     <input type="hidden" name="rowId" value="@row.Id" />
 
-                    <button type="submit"
-                            class="btn btn-outline-primary column-button w-100 p-2 @(isDisabled ? "disabled" : "")"
-                    @(isDisabled ? "disabled" : null)>
+                    <button type="submit" class="btn btn-outline-primary column-button w-100 p-2">
 
-                        <!-- Název řady -->
-                        <div class="header-cell text-center fw-bold mb-2">
-                            @row.Name
-                        </div>
+                        @await Html.PartialAsync(
+                        "_HallColumnVisual",
+                                new HallColumnVisualModel
+                                {
+                                    Row = row,
+                                    MaxCapacity = maxCapacity,
+                                    PendingCalls = Model.PendingCalls,
+                                    CurrentTableId = Model.Table.Id
+                                })
 
-                        <!-- Sloty (čtverečky) -->
-                        @for (int pos = maxCapacity - 1; pos >= 0; pos--)
-                        {
-                            var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
-                            var cls = (slot != null && slot.State == PalletState.Occupied)
-                            ? "slot occupied"
-                            : "slot empty";
-
-                            <div class="slot-wrapper mb-1">
-                                <div class="@cls" style="border-color:@row.ColorHex"></div>
-                            </div>
-                        }
-
-                        <!-- Název artiklu -->
-                        <div class="article-label small text-muted text-center mt-1">
-                            @row.Article
-                        </div>
-                    </button>
-                </form>
-            }
+            </button>
+        </form>
+                }
 
         </div>
     }

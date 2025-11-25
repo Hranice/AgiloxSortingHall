@@ -3,7 +3,8 @@
     public enum PalletState
     {
         Empty = 0,    // Prázdná pozice
-        Occupied = 1  // Je na ní nějaká paleta
+        Occupied = 1,  // Je na ní nějaká paleta
+        InTransit = 2 // Paleta je v převozu
     }
 
     public class PalletSlot
