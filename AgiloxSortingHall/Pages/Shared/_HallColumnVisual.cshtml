@@ -6,17 +6,27 @@
     var row = Model.Row;
     var maxCapacity = Model.MaxCapacity;
 
+    var now = DateTime.UtcNow;
+    var transitDuration = TimeSpan.FromSeconds(10);
+
+    // Pending cally pro TUTO řadu
     var rowQueue = Model.PendingCalls
         .Where(c => c.HallRowId == row.Id && c.Status == RowCallStatus.Pending)
         .OrderBy(c => c.RequestedAt)
         .ToList();
 
+    // Obsazené sloty v řadě odspoda nahoru
     var occupiedSlots = row.Slots
         .Where(s => s.State == PalletState.Occupied)
         .OrderBy(s => s.PositionIndex)
         .ToList();
 
+    // slotId -> popisek stolu
     var labelBySlotId = new Dictionary<int, string>();
+
+    // slotId -> jestli je "v převozu" (podle času požadavku)
+    var inTransitSlotIds = new HashSet<int>();
+
     int idx = 0;
     foreach (var slot in occupiedSlots)
     {
@@ -31,19 +41,23 @@
         }
 
         labelBySlotId[slot.Id] = tableName;
+
+        // Simulace: prvních 10 s od požadavku je paleta "v převozu"
+        if (now - call.RequestedAt < transitDuration)
+        {
+            inTransitSlotIds.Add(slot.Id);
+        }
+
         idx++;
     }
 
     var remainingQueue = rowQueue.Skip(idx).ToList();
 }
 
-
-<!-- Název řady -->
 <div class="header-cell text-center fw-bold mb-2">
     @row.Name
 </div>
 
-<!-- Sloty (čtverečky) -->
 @for (int pos = maxCapacity - 1; pos >= 0; pos--)
 {
     var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
@@ -51,20 +65,19 @@
     var cls = "slot empty";
     string? label = null;
 
-    if (slot != null)
+    if (slot != null && slot.State == PalletState.Occupied)
     {
-        if (slot.State == PalletState.Occupied)
-        {
-            cls = "slot occupied";
-            if (labelBySlotId.TryGetValue(slot.Id, out var lbl))
-            {
-                label = lbl;
-            }
-        }
-        else if (slot.State == PalletState.InTransit)
+        // buď běžná obsazená, nebo "v převozu"
+        if (inTransitSlotIds.Contains(slot.Id))
         {
             cls = "slot in-transit";
         }
+        else
+        {
+            cls = "slot occupied";
+        }
+
+        labelBySlotId.TryGetValue(slot.Id, out label);
     }
 
     <div class="slot-wrapper mb-1">
@@ -79,13 +92,10 @@
     </div>
 }
 
-
-<!-- Název artiklu řady -->
 <div class="article-label small text-muted text-center mt-1">
     @row.Article
 </div>
 
-<!-- Zbytek fronty pro tuto řadu -->
 @if (remainingQueue.Any())
 {
     <div class="queue-label small text-muted text-center mt-1">

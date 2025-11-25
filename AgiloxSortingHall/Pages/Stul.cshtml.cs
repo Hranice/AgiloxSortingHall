@@ -1,4 +1,4 @@
-using AgiloxSortingHall.Data;
+Ôªøusing AgiloxSortingHall.Data;
 using AgiloxSortingHall.Hubs;
 using AgiloxSortingHall.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -24,11 +24,11 @@ namespace AgiloxSortingHall.Pages
         public WorkTable Table { get; set; } = null!;
         public List<HallRow> Rows { get; set; } = new();
 
-        // Aktu·lnÌ ËekajÌcÌ call (pokud existuje)
+        // Aktu√°ln√≠ ƒçekaj√≠c√≠ call (pokud existuje)
         public RowCall? PendingCall { get; set; }
 
         /// <summary>
-        /// Vöechny pending call-y pro vizualizaci fronty na m¯Ìûce.
+        /// V≈°echny pending call-y pro vizualizaci fronty na m≈ô√≠≈æce.
         /// </summary>
         public List<RowCall> PendingCalls { get; set; } = new();
 
@@ -36,7 +36,7 @@ namespace AgiloxSortingHall.Pages
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Table = await _db.WorkTables.FindAsync(id)
-                ?? throw new Exception("St˘l nenalezen");
+                ?? throw new Exception("St≈Øl nenalezen");
 
             Rows = await _db.HallRows
                 .Include(r => r.Slots)
@@ -59,10 +59,10 @@ namespace AgiloxSortingHall.Pages
             return Page();
         }
 
-        // St˘l si "zavol·" konkrÈtnÌ ¯adu
+        // St≈Øl si "zavol√°" konkr√©tn√≠ ≈ôadu
         public async Task<IActionResult> OnPostCallRowAsync(int id, int rowId)
         {
-            // id = WorkTableId (z route), rowId = poûadovan· ¯ada
+            // id = WorkTableId (z route), rowId = po≈æadovan√° ≈ôada
             bool alreadyPending = await _db.RowCalls
                 .AnyAsync(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending);
 
@@ -95,32 +95,33 @@ namespace AgiloxSortingHall.Pages
                 return RedirectToPage(new { id });
             }
 
+            var rowQueue = await _db.RowCalls
+                .Where(c => c.HallRowId == call.HallRowId && c.Status == RowCallStatus.Pending)
+                .OrderBy(c => c.RequestedAt)
+                .ToListAsync();
+
+            var firstInRow = rowQueue.FirstOrDefault();
+            if (firstInRow == null || firstInRow.Id != call.Id)
+            {
+                // Nƒõkdo je je≈°tƒõ p≈ôed n√°mi => nem≈Ø≈æeme doruƒçit, Agilox by musel "p≈ôeskakovat"
+                return RedirectToPage(new { id });
+            }
+
+            // Vybereme spodn√≠ obsazen√Ω slot v dan√© ≈ôadƒõ a vypr√°zdn√≠me ho
             var row = await _db.HallRows
                 .Include(r => r.Slots)
                 .FirstOrDefaultAsync(r => r.Id == call.HallRowId);
 
             if (row != null)
             {
-                var rowQueue = await _db.RowCalls
-                    .Where(c => c.HallRowId == row.Id && c.Status == RowCallStatus.Pending)
-                    .OrderBy(c => c.RequestedAt)
-                    .ToListAsync();
-
-                var occupiedSlots = row.Slots
+                var bottomSlot = row.Slots
                     .Where(s => s.State == PalletState.Occupied)
                     .OrderBy(s => s.PositionIndex)
-                    .ToList();
+                    .FirstOrDefault();
 
-                var callIndex = rowQueue.FindIndex(c => c.Id == call.Id);
-
-                // Pokud m· tahle ¯ada mÈnÏ palet neû je po¯adÌ callu,
-                // tahle konkrÈtnÌ û·dost zatÌm nem· "svou" fyzickou paletu.
-                // V takovÈm p¯ÌpadÏ fyzicky nic neodebÌr·me, jen oznaËÌme call jako doruËen˝.
-                if (callIndex >= 0 && callIndex < occupiedSlots.Count)
+                if (bottomSlot != null)
                 {
-                    var assignedSlot = occupiedSlots[callIndex];
-
-                    assignedSlot.State = PalletState.Empty;
+                    bottomSlot.State = PalletState.Empty;
                 }
             }
 
@@ -132,10 +133,9 @@ namespace AgiloxSortingHall.Pages
             return RedirectToPage(new { id });
         }
 
-
-
         public async Task<IActionResult> OnPostCancelCallAsync(int id)
         {
+            // najdeme pending call pro dan√Ω st≈Øl
             var call = await _db.RowCalls
                 .Where(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending)
                 .OrderByDescending(c => c.RequestedAt)
@@ -144,10 +144,14 @@ namespace AgiloxSortingHall.Pages
             if (call != null)
             {
                 call.Status = RowCallStatus.Cancelled;
+
                 await _db.SaveChangesAsync();
+
+                await _hub.Clients.All.SendAsync("HallUpdated");
             }
 
             return RedirectToPage(new { id });
         }
+
     }
 }
