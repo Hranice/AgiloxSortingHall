@@ -23,6 +23,6 @@
 
         public RowCallStatus Status { get; set; } = RowCallStatus.Pending;
 
-        public string RequestId { get; set; } = null!;
+        public string? RequestId { get; set; } = null!;
     }
 }

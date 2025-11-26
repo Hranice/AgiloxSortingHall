@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Json;
 
 namespace AgiloxSortingHall.Pages
 {
@@ -13,12 +15,14 @@ namespace AgiloxSortingHall.Pages
         private readonly ILogger<SkladnikModel> _logger;
         private readonly AppDbContext _db;
         private readonly IHubContext<HallHub> _hub;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public SkladnikModel(ILogger<SkladnikModel> logger, AppDbContext db, IHubContext<HallHub> hub)
+        public SkladnikModel(ILogger<SkladnikModel> logger, AppDbContext db, IHubContext<HallHub> hub, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _db = db;
             _hub = hub;
+            _httpClientFactory = httpClientFactory;
         }
 
         public List<HallRow> Rows { get; set; } = new();
@@ -101,14 +105,11 @@ namespace AgiloxSortingHall.Pages
         }
 
 
-        /// <summary>
-        /// Pøidání jedné palety do dané øady.
-        /// Palety se pøidávají shora dolù – hledáme prázdný slot s nejvyšším indexem.
-        /// Název artiklu musí být uložený (row.Article nenulové).
-        /// </summary>
         public async Task<IActionResult> OnPostAddPalletAsync(int rowId)
         {
-            var row = await _db.HallRows.FirstOrDefaultAsync(r => r.Id == rowId);
+            var row = await _db.HallRows
+                .Include(r => r.Slots)
+                .FirstOrDefaultAsync(r => r.Id == rowId);
             if (row == null)
             {
                 ErrorMessage = "Øada nebyla nalezena.";
@@ -117,16 +118,14 @@ namespace AgiloxSortingHall.Pages
 
             if (string.IsNullOrWhiteSpace(row.Article))
             {
-                ErrorMessage =
-                    $"Øada {row.Name} nemá uložený název artiklu. " +
-                    $"Nejprve ho zadejte a uložte.";
+                ErrorMessage = $"Øada {row.Name} nemá uložený název artiklu. Nejprve ho zadejte a uložte.";
                 return RedirectToPage();
             }
 
-            var emptySlot = await _db.PalletSlots
-                .Where(s => s.HallRowId == rowId && s.State == PalletState.Empty)
+            var emptySlot = row.Slots
+                .Where(s => s.State == PalletState.Empty)
                 .OrderByDescending(s => s.PositionIndex)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (emptySlot == null)
             {
@@ -137,9 +136,69 @@ namespace AgiloxSortingHall.Pages
             emptySlot.State = PalletState.Occupied;
 
             await _db.SaveChangesAsync();
-            await _hub.Clients.All.SendAsync("HallUpdated");
 
+            // po doplnìní palety zkusíme odpálit workflow pro první èekající call
+            await TryDispatchAgiloxForRowAsync(row);
+
+            await _hub.Clients.All.SendAsync("HallUpdated");
             return RedirectToPage();
+        }
+
+        /// <summary>
+        /// Spustí workflow pro první èekající call,
+        /// pokud má øada volnou paletu.
+        /// </summary>
+        private async Task TryDispatchAgiloxForRowAsync(HallRow row)
+        {
+            // spoèítáme obsazené sloty
+            var occupiedCount = row.Slots.Count(s => s.State == PalletState.Occupied);
+
+            var dispatchedCount = await _db.RowCalls
+                .Where(c => c.HallRowId == row.Id &&
+                            c.Status == RowCallStatus.Pending &&
+                            c.RequestId != null)
+                .CountAsync();
+
+            if (occupiedCount <= dispatchedCount)
+            {
+                // i po doplnìní palety nejsme nad limitem – nic neposíláme
+                return;
+            }
+
+            var callToDispatch = await _db.RowCalls
+                .Include(c => c.WorkTable)
+                .Include(c => c.HallRow)
+                .Where(c => c.HallRowId == row.Id &&
+                            c.Status == RowCallStatus.Pending &&
+                            c.RequestId == null)
+                .OrderBy(c => c.RequestedAt)
+                .FirstOrDefaultAsync();
+
+            if (callToDispatch == null)
+                return;
+
+            var requestId = Guid.NewGuid().ToString("N");
+
+            var client = _httpClientFactory.CreateClient("Agilox");
+
+            var payload = new Dictionary<string, string>
+            {
+                ["@ZAKLIKNUTARADA"] = row.Name,
+                ["@PRIJEMCE"] = callToDispatch.WorkTable.Name,
+                ["@REQUESTID"] = requestId
+            };
+
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync("workflow/502", content);
+            response.EnsureSuccessStatusCode();
+
+            callToDispatch.RequestId = requestId;
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Skladník – odeslán workflow 502 pro øadu {Row} a stùl {Table}, requestId={Req}",
+                row.Name, callToDispatch.WorkTable.Name, requestId);
         }
 
 

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Json;
 
 namespace AgiloxSortingHall.Pages
 {
@@ -60,9 +62,15 @@ namespace AgiloxSortingHall.Pages
             return Page();
         }
 
-        // Stůl si "zavolá" konkrétní řadu
+        /// <summary>
+        /// Stůl si "zavolá" konkrétní řadu.
+        /// Vždy vytvoříme RowCall (aby byl vidět ve frontě),
+        /// ale workflow na Agilox se spouští jen pokud je v řadě
+        /// volná paleta (Occupied) nad rámec už odeslaných požadavků.
+        /// </summary>
         public async Task<IActionResult> OnPostCallRowAsync(int id, int rowId)
         {
+            // stůl může mít jen jeden pending call
             bool alreadyPending = await _db.RowCalls
                 .AnyAsync(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending);
 
@@ -70,49 +78,99 @@ namespace AgiloxSortingHall.Pages
                 return RedirectToPage(new { id });
 
             var table = await _db.WorkTables.FindAsync(id);
-            var row = await _db.HallRows.FindAsync(rowId);
+            var row = await _db.HallRows
+                .Include(r => r.Slots)
+                .FirstOrDefaultAsync(r => r.Id == rowId);
 
             if (table == null || row == null)
                 return RedirectToPage(new { id });
 
-            var requestId = Guid.NewGuid().ToString("N");
-
+            // vytvoříme nový call – zatím jen Pending, bez RequestId
             var call = new RowCall
             {
                 WorkTableId = id,
                 HallRowId = rowId,
                 Status = RowCallStatus.Pending,
-                RequestedAt = DateTime.UtcNow,
-                RequestId = requestId
+                RequestedAt = DateTime.UtcNow
             };
 
             _db.RowCalls.Add(call);
             await _db.SaveChangesAsync();
 
+            // pokusíme se pro tuto řadu ihned spustit workflow,
+            // pokud je k dispozici volná paleta
+            await TryDispatchAgiloxForRowAsync(row, table);
+
+            await _hub.Clients.All.SendAsync("HallUpdated");
+
+            return RedirectToPage(new { id });
+        }
+
+        /// <summary>
+        /// Zkusí spustit workflow na Agilaxe pro první čekající RowCall
+        /// v dané řadě, pokud je k dispozici volná paleta.
+        /// Volná paleta = počet Occupied slotů > počet callů, které už
+        /// mají přiřazené RequestId (tj. už na ně běží workflow).
+        /// </summary>
+        private async Task TryDispatchAgiloxForRowAsync(HallRow row, WorkTable table)
+        {
+            // spočítáme počet fyzicky obsazených slotů (palet) v řadě
+            var occupiedCount = row.Slots.Count(s => s.State == PalletState.Occupied);
+
+            // kolik pending callů pro tuto řadu už má přiřazené requestId (tj. poslali jsme na Agiloxe)
+            var dispatchedCount = await _db.RowCalls
+                .Where(c => c.HallRowId == row.Id &&
+                            c.Status == RowCallStatus.Pending &&
+                            c.RequestId != null)
+                .CountAsync();
+
+            // pokud není k dispozici žádná volná paleta, jen čekáme na doplnění
+            if (occupiedCount <= dispatchedCount)
+            {
+                _logger.LogInformation("Řada {Row} nemá volnou paletu – workflow se zatím nespouští.", row.Name);
+                return;
+            }
+
+            // vezmeme první čekající call bez RequestId (nejstarší)
+            var callToDispatch = await _db.RowCalls
+                .Include(c => c.WorkTable)
+                .Include(c => c.HallRow)
+                .Where(c => c.HallRowId == row.Id &&
+                            c.Status == RowCallStatus.Pending &&
+                            c.RequestId == null)
+                .OrderBy(c => c.RequestedAt)
+                .FirstOrDefaultAsync();
+
+            if (callToDispatch == null)
+            {
+                // nikdo ve frontě nečeká – není co dispatchnout
+                return;
+            }
+
+            // vygenerujeme si vlastní requestId, které pošleme Agiloxu
+            var requestId = Guid.NewGuid().ToString("N");
+
             var client = _httpClientFactory.CreateClient("Agilox");
 
             var payload = new Dictionary<string, string>
             {
-                ["@ZAKLIKNUTARADA"] = row.Name,    // např. "Řada3"
-                ["@PRIJEMCE"] = table.Name,  // např. "Stůl 1"
+                ["@ZAKLIKNUTARADA"] = row.Name,             // např. "Řada3"
+                ["@PRIJEMCE"] = callToDispatch.WorkTable.Name,  // např. "Stůl 1"
                 ["@REQUESTID"] = requestId
             };
 
-            try
-            {
-                var json = System.Text.Json.JsonSerializer.Serialize(payload);
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync("workflow/502", content);
-                response.EnsureSuccessStatusCode();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Chyba při volání Agilox API");
-            }
+            var response = await client.PostAsync("workflow/502", content);
+            response.EnsureSuccessStatusCode();
 
-            await _hub.Clients.All.SendAsync("HallUpdated");
-            return RedirectToPage(new { id });
+            // uložíme si requestId do callu – to se nám vrátí v callbacku
+            callToDispatch.RequestId = requestId;
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Odeslán workflow 502 pro řadu {Row} a stůl {Table}, requestId={Req}",
+                row.Name, callToDispatch.WorkTable.Name, requestId);
         }
 
 
