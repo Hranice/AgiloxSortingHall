@@ -124,8 +124,7 @@ body {
 }
 
 
-/*.slot.in-transit {
-    background-color: #f0f0f0;
+.slot.in-transit {
     border-style: dashed;
-}*/
+}
 

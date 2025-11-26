@@ -6,16 +6,19 @@
     var row = Model.Row;
     var maxCapacity = Model.MaxCapacity;
 
-    var now = DateTime.UtcNow;
-    var transitDuration = TimeSpan.FromSeconds(10);
-
-    // Všechny pending call-y pro tuto řadu (seřazené podle času)
+    // pending call-y pro tuto řadu (seřazené podle času požadavku)
     var rowQueue = Model.PendingCalls
         .Where(c => c.HallRowId == row.Id && c.Status == RowCallStatus.Pending)
         .OrderBy(c => c.RequestedAt)
         .ToList();
 
-    // Obsazené sloty v této řadě (odspoda nahoru)
+    // z pending callů vyfiltrujeme ty, které už mají spuštěný workflow na Agiloxu
+    var dispatchedCalls = rowQueue
+        .Where(c => !string.IsNullOrEmpty(c.RequestId))
+        .OrderBy(c => c.RequestedAt)
+        .ToList();
+
+    // obsazené sloty v řadě (odspoda nahoru)
     var occupiedSlots = row.Slots
         .Where(s => s.State == PalletState.Occupied)
         .OrderBy(s => s.PositionIndex)
@@ -24,41 +27,31 @@
     // slotId -> popisek stolu (STŮL X)
     var labelBySlotId = new Dictionary<int, string>();
 
-    // Id slotu, který je "v převozu" (jen jeden – první ve frontě)
-    int? inTransitSlotId = null;
+    // sloty, které jsou "v převozu" = mají na sobě běžící order na Agiloxu
+    var inTransitSlotIds = new HashSet<int>();
 
-    // 1) namapujeme frontu na obsazené sloty (1. call -> spodní paleta, 2. call -> další, ...)
-    for (int i = 0; i < occupiedSlots.Count && i < rowQueue.Count; i++)
+    // mapujeme jen tolik slotů, kolik máme jak obsazených slotů, tak dispatched callů
+    var mapCount = Math.Min(occupiedSlots.Count, dispatchedCalls.Count);
+
+    for (int i = 0; i < mapCount; i++)
     {
         var slot = occupiedSlots[i];
-        var call = rowQueue[i];
+        var call = dispatchedCalls[i];
 
         var tableName = call.WorkTable?.Name ?? $"Stůl {call.WorkTableId}";
 
-        // zvýraznění aktuálního stolu (na stránce jednoho stolu)
+        // zvýraznění aktuálního stolu (na stránce konkrétního stolu)
         if (Model.CurrentTableId.HasValue && call.WorkTableId == Model.CurrentTableId.Value)
         {
             tableName = $"▶ {tableName}";
         }
 
         labelBySlotId[slot.Id] = tableName;
+        inTransitSlotIds.Add(slot.Id);
     }
 
-    // 2) rozhodneme, jestli PRVNÍ call je zrovna "v převozu"
-    if (rowQueue.Any() && occupiedSlots.Any())
-    {
-        var firstCall = rowQueue.First();
-        // pokud od požadavku neuplynulo 10s, bereme to jako "v převozu"
-        if (now - firstCall.RequestedAt < transitDuration)
-        {
-            // první call patří spodní paletě = prvnímu obsazenému slotu
-            inTransitSlotId = occupiedSlots.First().Id;
-        }
-    }
-
-    // 3) fronta, která se nevešla na palety (pro text "fronta: ...")
-    var mappedCount = Math.Min(occupiedSlots.Count, rowQueue.Count);
-    var remainingQueue = rowQueue.Skip(mappedCount).ToList();
+    // zbytek fronty = pending cally, které zatím nemají přidělenou paletu
+    var remainingQueue = rowQueue.Skip(mapCount).ToList();
 }
 
 <!-- Název řady -->
@@ -76,16 +69,16 @@
 
     if (slot != null && slot.State == PalletState.Occupied)
     {
-        // defaultně obsazená
+        // defaultně obsazená paleta
         cls = "slot occupied";
 
-        // pokud je to konkrétní paleta, která je "v převozu", použijeme dashed styl
-        if (inTransitSlotId.HasValue && slot.Id == inTransitSlotId.Value)
+        // pokud je tahle paleta přiřazená běžícímu orderu, zobrazíme ji jako "in-transit"
+        if (inTransitSlotIds.Contains(slot.Id))
         {
             cls = "slot in-transit";
         }
 
-        // popisek (název stolu), pokud je namapovaný
+        // popisek stolu, pokud je namapovaný
         labelBySlotId.TryGetValue(slot.Id, out label);
     }
 
@@ -106,11 +99,11 @@
     @row.Article
 </div>
 
-<!-- Zbytek fronty -->
+<!-- Zbytek fronty (ti, co čekají na paletu) -->
 @if (remainingQueue.Any())
 {
     <div class="queue-label small text-muted text-center mt-1">
-        fronta:
+        fronta (čekají na paletu):
         @string.Join(", ",
         remainingQueue.Select(c => c.WorkTable?.Name ?? $"Stůl {c.WorkTableId}"))
 </div>
