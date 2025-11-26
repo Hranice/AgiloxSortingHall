@@ -139,7 +139,6 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\rjimswa.dswa.cache.json
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\rjsmrazor.dswa.cache.json
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\rjsmcshtml.dswa.cache.json
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\exdf17do33-{0}-ivx9tef981-ivx9tef981.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\3a2fg0yb9w-{0}-61n19gt1b8-61n19gt1b8.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\v141eiou22-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\7hshqq6s1a-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -522,3 +521,4 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\mscorrc.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\msquic.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\aspnetcorev2_inprocess.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\exdf17do33-{0}-eybrid09k6-eybrid09k6.gz
