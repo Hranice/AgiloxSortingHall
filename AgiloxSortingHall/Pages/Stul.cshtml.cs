@@ -226,23 +226,103 @@ namespace AgiloxSortingHall.Pages
 
         public async Task<IActionResult> OnPostCancelCallAsync(int id)
         {
-            // najdeme pending call pro daný stůl
+            // Najdeme nejnovější pending call pro daný stůl
             var call = await _db.RowCalls
+                .Include(c => c.HallRow)
+                .Include(c => c.WorkTable)
                 .Where(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending)
                 .OrderByDescending(c => c.RequestedAt)
                 .FirstOrDefaultAsync();
 
-            if (call != null)
+            if (call == null)
             {
-                call.Status = RowCallStatus.Cancelled;
-
-                await _db.SaveChangesAsync();
-
-                await _hub.Clients.All.SendAsync("HallUpdated");
+                // Není co rušit
+                return RedirectToPage(new { id });
             }
+
+            // Pokud už jsme na tento call poslali workflow na Agiloxe
+            // (tj. máme uložené naše REQUESTID), zkusíme zrušit i order na Agiloxu
+            if (!string.IsNullOrEmpty(call.RequestId))
+            {
+                try
+                {
+                    var client = _httpClientFactory.CreateClient("Agilox");
+
+                    // /order vrací obří objekt: { "<orderIdString>": { ... }, ... }
+                    var ordersJson = await client.GetStringAsync("order");
+
+                    using var doc = JsonDocument.Parse(ordersJson);
+                    var root = doc.RootElement;
+
+                    long? orderIdToCancel = null;
+
+                    // projdeme všechny ordery na prvním levelu
+                    foreach (var orderProp in root.EnumerateObject())
+                    {
+                        var orderObj = orderProp.Value;
+
+                        // uvnitř hledáme sekci "vars"
+                        if (!orderObj.TryGetProperty("vars", out var vars))
+                            continue;
+
+                        // a v ní @REQUESTID
+                        if (!vars.TryGetProperty("@REQUESTID", out var reqIdProp))
+                            continue;
+
+                        var reqId = reqIdProp.GetString();
+
+                        if (!string.Equals(reqId, call.RequestId, StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        // našli jsme správný order -> vytáhneme "id"
+                        if (orderObj.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number)
+                        {
+                            if (idProp.TryGetInt64(out var orderId))
+                            {
+                                orderIdToCancel = orderId;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (orderIdToCancel.HasValue)
+                    {
+                        // pošleme storno na /order
+                        var cancelPayload = new
+                        {
+                            id = orderIdToCancel.Value,
+                            cancel = "true"
+                        };
+
+                        var resp = await client.PostAsJsonAsync("order", cancelPayload);
+                        resp.EnsureSuccessStatusCode();
+
+                        _logger.LogInformation(
+                            "Agilox order {OrderId} (requestId={Req}) byl zrušen.",
+                            orderIdToCancel.Value,
+                            call.RequestId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "Agilox order pro requestId={Req} nebyl v /order nalezen, ruším jen v DB.",
+                            call.RequestId);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex,
+                        "Chyba při rušení Agilox orderu pro requestId={Req}.",
+                        call.RequestId);
+                }
+            }
+
+            call.Status = RowCallStatus.Cancelled;
+            await _db.SaveChangesAsync();
+
+            await _hub.Clients.All.SendAsync("HallUpdated");
 
             return RedirectToPage(new { id });
         }
-
     }
 }
