@@ -17,6 +17,10 @@ namespace AgiloxSortingHall.Pages
         private readonly IHubContext<HallHub> _hub;
         private readonly IHttpClientFactory _httpClientFactory;
 
+        /// <summary>
+        /// Inicializuje instanci StulModel, včetně databázového kontextu,
+        /// loggeru, SignalR hubu a továrny na HttpClient.
+        /// </summary>
         public StulModel(ILogger<StulModel> logger, AppDbContext db, IHubContext<HallHub> hub, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
@@ -25,10 +29,19 @@ namespace AgiloxSortingHall.Pages
             _httpClientFactory = httpClientFactory;
         }
 
+        /// <summary>
+        /// Aktuální stůl instance.
+        /// </summary>
         public WorkTable Table { get; set; } = null!;
+
+        /// <summary>
+        /// Řady v hale spolu s jejich sloty.
+        /// </summary>
         public List<HallRow> Rows { get; set; } = new();
 
-        // Aktuální čekající call (pokud existuje)
+        /// <summary>
+        /// Aktuální čekající call (pokud existuje)
+        /// </summary>
         public RowCall? PendingCall { get; set; }
 
         /// <summary>
@@ -36,6 +49,11 @@ namespace AgiloxSortingHall.Pages
         /// </summary>
         public List<RowCall> PendingCalls { get; set; } = new();
 
+        /// <summary>
+        /// Načte data pro stránku stolu: konkrétní stůl, všechny řady,
+        /// aktuální čekající call daného stolu a všechny pending call-y
+        /// pro zobrazení stavu fronty.
+        /// </summary>
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Table = await _db.WorkTables.FindAsync(id)
@@ -174,56 +192,11 @@ namespace AgiloxSortingHall.Pages
         }
 
 
-        public async Task<IActionResult> OnPostConfirmDeliveredAsync(int id)
-        {
-            var call = await _db.RowCalls
-                .Where(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending)
-                .OrderByDescending(c => c.RequestedAt)
-                .FirstOrDefaultAsync();
-
-            if (call == null)
-            {
-                return RedirectToPage(new { id });
-            }
-
-            var rowQueue = await _db.RowCalls
-                .Where(c => c.HallRowId == call.HallRowId && c.Status == RowCallStatus.Pending)
-                .OrderBy(c => c.RequestedAt)
-                .ToListAsync();
-
-            var firstInRow = rowQueue.FirstOrDefault();
-            if (firstInRow == null || firstInRow.Id != call.Id)
-            {
-                // Někdo je ještě před námi => nemůžeme doručit, Agilox by musel "přeskakovat"
-                return RedirectToPage(new { id });
-            }
-
-            // Vybereme spodní obsazený slot v dané řadě a vyprázdníme ho
-            var row = await _db.HallRows
-                .Include(r => r.Slots)
-                .FirstOrDefaultAsync(r => r.Id == call.HallRowId);
-
-            if (row != null)
-            {
-                var bottomSlot = row.Slots
-                    .Where(s => s.State == PalletState.Occupied)
-                    .OrderBy(s => s.PositionIndex)
-                    .FirstOrDefault();
-
-                if (bottomSlot != null)
-                {
-                    bottomSlot.State = PalletState.Empty;
-                }
-            }
-
-            call.Status = RowCallStatus.Delivered;
-
-            await _db.SaveChangesAsync();
-            await _hub.Clients.All.SendAsync("HallUpdated");
-
-            return RedirectToPage(new { id });
-        }
-
+        /// <summary>
+        /// Zruší nejnovější pending RowCall daného stolu.
+        /// Pokud má call přiřazené RequestId, pokusí se najít a zrušit
+        /// související order i na Agiloxu. Poté označí call jako Cancelled.
+        /// </summary>
         public async Task<IActionResult> OnPostCancelCallAsync(int id)
         {
             // Najdeme nejnovější pending call pro daný stůl
