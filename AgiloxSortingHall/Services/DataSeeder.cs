@@ -14,17 +14,31 @@ namespace AgiloxSortingHall.Services
         public List<WorkTableConfig> Tables { get; set; } = new();
     }
 
+    /// <summary>
+    /// Třída umožňující inicializaci databáze
+    /// podle konfigurace haly (řady a stoly).
+    /// </summary>
     public class DataSeeder
     {
         private readonly AppDbContext _db;
         private readonly HallConfig _config;
 
+        /// <summary>
+        /// Inicializuje DataSeeder injektovaným AppDbContextem
+        /// a konfiguračními daty haly.
+        /// </summary>
         public DataSeeder(AppDbContext db, IOptions<HallConfig> config)
         {
             _db = db;
             _config = config.Value;
         }
 
+        /// <summary>
+        /// Naplní databázi výchozími daty:
+        /// - vytvoří řady dle konfigurace, včetně všech slotů
+        /// - vytvoří pracovní stoly dle konfigurace
+        /// Metoda je idempotentní (opakované spuštění nic nezdvojí).
+        /// </summary>
         public async Task SeedAsync()
         {
             // Seed řad

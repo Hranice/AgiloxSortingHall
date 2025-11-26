@@ -2,17 +2,24 @@
 @using AgiloxSortingHall.Models
 @using AgiloxSortingHall.ViewModels
 @model AgiloxSortingHall.Pages.SkladnikModel
+
 @{
+    // Titulek stránky pro layout a prohlížeč
     ViewData["Title"] = "Skladník";
+
+    // Zjištění největší kapacity řad – používá se pro CSS grid
     var maxCapacity = Model.Rows.Max(r => r.Capacity);
 }
+
 <div class="container-fluid hall-page" style="--slot-count:@maxCapacity;">
+
     <div class="row">
         <div class="col-12">
             <h1 class="my-3">Skladník</h1>
         </div>
     </div>
 
+    @* Zobrazení chyby pokud nějaká vznikla (např. nevalidní operace apod.) *@
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <div class="row">
@@ -22,12 +29,22 @@
         </div>
     }
 
+    @* Kontejner se všemi sloupci (řadami v hale) *@
     <div class="hall-columns-container">
 
         @foreach (var row in Model.Rows)
         {
             <div class="hall-column">
 
+                @* 
+                   Vykreslení vizuální reprezentace řady:
+                   - obsazené sloty
+                   - volné sloty
+                   - pending call-y
+                   - kapacita
+                   
+                   Tento partial používá jednotný vzhled i s view stolu.
+                *@
                 @await Html.PartialAsync(
                 "_HallColumnVisual",
                         new HallColumnVisualModel
@@ -35,19 +52,21 @@
                             Row = row,
                             MaxCapacity = maxCapacity,
                             PendingCalls = Model.PendingCalls,
-                            CurrentTableId = null
+                            CurrentTableId = null // skladník není vázán na konkrétní stůl
                         })
 
-            <!-- Formulář + tlačítka -->
+            @* Formulář pro manipulaci s danou řadou *@
             <form method="post" class="w-100 mt-2">
                 <input type="hidden" name="rowId" value="@row.Id" />
 
+                @* Textové pole pro zadání/změnu názvu artiklu v řadě *@
                 <div class="input-group input-group-sm mb-1">
                     <input type="text"
                            class="form-control"
                            placeholder="Název artiklu"
                            name="RowArticle[@row.Id]"
                            value="@(Model.RowArticle[row.Id])" />
+
                     <button class="btn btn-outline-primary"
                             type="submit"
                             asp-page-handler="SetArticle">
@@ -55,14 +74,14 @@
                     </button>
                 </div>
 
-                <!-- Přidat paletu -->
+                @* Přidání palety do nejbližšího volného slotu *@
                 <button class="btn btn-success btn-sm w-100"
                         type="submit"
                         asp-page-handler="AddPallet">
                     +1
                 </button>
 
-                <!-- Odebrat paletu (horní v řadě) s potvrzovacím dialogem -->
+                @* Odebrání horní palety – chráněno JS confirm dialogem *@
                 <button class="btn btn-outline-danger btn-sm w-100 mt-1"
                         type="submit"
                         asp-page-handler="RemovePallet"
@@ -71,11 +90,12 @@
                 </button>
             </form>
 
+            @* Zobrazení názvu artiklu pod sloupcem (čistě informativní) *@
             <div class="small text-muted text-center mt-1">
                 @row.Article
             </div>
+
         </div>
                 }
-
     </div>
 </div>
