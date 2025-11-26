@@ -38,6 +38,7 @@
                             CurrentTableId = null
                         })
 
+            <!-- Formulář + tlačítka -->
             <form method="post" class="w-100 mt-2">
                 <input type="hidden" name="rowId" value="@row.Id" />
 
@@ -54,10 +55,19 @@
                     </button>
                 </div>
 
+                <!-- Přidat paletu -->
                 <button class="btn btn-success btn-sm w-100"
                         type="submit"
                         asp-page-handler="AddPallet">
                     +1
+                </button>
+
+                <!-- Odebrat paletu (horní v řadě) s potvrzovacím dialogem -->
+                <button class="btn btn-outline-danger btn-sm w-100 mt-1"
+                        type="submit"
+                        asp-page-handler="RemovePallet"
+                        onclick="return confirm('Opravdu odebrat jednu paletu z této řady?');">
+                    -1
                 </button>
             </form>
 

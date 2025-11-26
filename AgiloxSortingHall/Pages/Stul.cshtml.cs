@@ -13,12 +13,14 @@ namespace AgiloxSortingHall.Pages
         private readonly AppDbContext _db;
         private readonly ILogger<StulModel> _logger;
         private readonly IHubContext<HallHub> _hub;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public StulModel(ILogger<StulModel> logger, AppDbContext db, IHubContext<HallHub> hub)
+        public StulModel(ILogger<StulModel> logger, AppDbContext db, IHubContext<HallHub> hub, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _db = db;
             _hub = hub;
+            _httpClientFactory = httpClientFactory;
         }
 
         public WorkTable Table { get; set; } = null!;
@@ -31,7 +33,6 @@ namespace AgiloxSortingHall.Pages
         /// Všechny pending call-y pro vizualizaci fronty na mřížce.
         /// </summary>
         public List<RowCall> PendingCalls { get; set; } = new();
-
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -62,26 +63,58 @@ namespace AgiloxSortingHall.Pages
         // Stůl si "zavolá" konkrétní řadu
         public async Task<IActionResult> OnPostCallRowAsync(int id, int rowId)
         {
-            // id = WorkTableId (z route), rowId = požadovaná řada
             bool alreadyPending = await _db.RowCalls
                 .AnyAsync(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending);
 
-            if (!alreadyPending)
-            {
-                var call = new RowCall
-                {
-                    WorkTableId = id,
-                    HallRowId = rowId,
-                    Status = RowCallStatus.Pending
-                };
-                _db.RowCalls.Add(call);
-                await _db.SaveChangesAsync();
+            if (alreadyPending)
+                return RedirectToPage(new { id });
 
-                await _hub.Clients.All.SendAsync("HallUpdated");
+            var table = await _db.WorkTables.FindAsync(id);
+            var row = await _db.HallRows.FindAsync(rowId);
+
+            if (table == null || row == null)
+                return RedirectToPage(new { id });
+
+            var requestId = Guid.NewGuid().ToString("N");
+
+            var call = new RowCall
+            {
+                WorkTableId = id,
+                HallRowId = rowId,
+                Status = RowCallStatus.Pending,
+                RequestedAt = DateTime.UtcNow,
+                RequestId = requestId
+            };
+
+            _db.RowCalls.Add(call);
+            await _db.SaveChangesAsync();
+
+            var client = _httpClientFactory.CreateClient("Agilox");
+
+            var payload = new Dictionary<string, string>
+            {
+                ["@ZAKLIKNUTARADA"] = row.Name,    // např. "Řada3"
+                ["@PRIJEMCE"] = table.Name,  // např. "Stůl 1"
+                ["@REQUESTID"] = requestId
+            };
+
+            try
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize(payload);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("workflow/502", content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Chyba při volání Agilox API");
             }
 
+            await _hub.Clients.All.SendAsync("HallUpdated");
             return RedirectToPage(new { id });
         }
+
 
         public async Task<IActionResult> OnPostConfirmDeliveredAsync(int id)
         {

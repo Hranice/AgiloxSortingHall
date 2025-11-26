@@ -9,55 +9,64 @@
     var now = DateTime.UtcNow;
     var transitDuration = TimeSpan.FromSeconds(10);
 
-    // Pending cally pro TUTO řadu
+    // Všechny pending call-y pro tuto řadu (seřazené podle času)
     var rowQueue = Model.PendingCalls
         .Where(c => c.HallRowId == row.Id && c.Status == RowCallStatus.Pending)
         .OrderBy(c => c.RequestedAt)
         .ToList();
 
-    // Obsazené sloty v řadě odspoda nahoru
+    // Obsazené sloty v této řadě (odspoda nahoru)
     var occupiedSlots = row.Slots
         .Where(s => s.State == PalletState.Occupied)
         .OrderBy(s => s.PositionIndex)
         .ToList();
 
-    // slotId -> popisek stolu
+    // slotId -> popisek stolu (STŮL X)
     var labelBySlotId = new Dictionary<int, string>();
 
-    // slotId -> jestli je "v převozu" (podle času požadavku)
-    var inTransitSlotIds = new HashSet<int>();
+    // Id slotu, který je "v převozu" (jen jeden – první ve frontě)
+    int? inTransitSlotId = null;
 
-    int idx = 0;
-    foreach (var slot in occupiedSlots)
+    // 1) namapujeme frontu na obsazené sloty (1. call -> spodní paleta, 2. call -> další, ...)
+    for (int i = 0; i < occupiedSlots.Count && i < rowQueue.Count; i++)
     {
-        if (idx >= rowQueue.Count) break;
+        var slot = occupiedSlots[i];
+        var call = rowQueue[i];
 
-        var call = rowQueue[idx];
         var tableName = call.WorkTable?.Name ?? $"Stůl {call.WorkTableId}";
 
+        // zvýraznění aktuálního stolu (na stránce jednoho stolu)
         if (Model.CurrentTableId.HasValue && call.WorkTableId == Model.CurrentTableId.Value)
         {
             tableName = $"▶ {tableName}";
         }
 
         labelBySlotId[slot.Id] = tableName;
-
-        // Simulace: prvních 10 s od požadavku je paleta "v převozu"
-        if (now - call.RequestedAt < transitDuration)
-        {
-            inTransitSlotIds.Add(slot.Id);
-        }
-
-        idx++;
     }
 
-    var remainingQueue = rowQueue.Skip(idx).ToList();
+    // 2) rozhodneme, jestli PRVNÍ call je zrovna "v převozu"
+    if (rowQueue.Any() && occupiedSlots.Any())
+    {
+        var firstCall = rowQueue.First();
+        // pokud od požadavku neuplynulo 10s, bereme to jako "v převozu"
+        if (now - firstCall.RequestedAt < transitDuration)
+        {
+            // první call patří spodní paletě = prvnímu obsazenému slotu
+            inTransitSlotId = occupiedSlots.First().Id;
+        }
+    }
+
+    // 3) fronta, která se nevešla na palety (pro text "fronta: ...")
+    var mappedCount = Math.Min(occupiedSlots.Count, rowQueue.Count);
+    var remainingQueue = rowQueue.Skip(mappedCount).ToList();
 }
 
+<!-- Název řady -->
 <div class="header-cell text-center fw-bold mb-2">
     @row.Name
 </div>
 
+<!-- Sloty -->
 @for (int pos = maxCapacity - 1; pos >= 0; pos--)
 {
     var slot = row.Slots.FirstOrDefault(s => s.PositionIndex == pos);
@@ -67,16 +76,16 @@
 
     if (slot != null && slot.State == PalletState.Occupied)
     {
-        // buď běžná obsazená, nebo "v převozu"
-        if (inTransitSlotIds.Contains(slot.Id))
+        // defaultně obsazená
+        cls = "slot occupied";
+
+        // pokud je to konkrétní paleta, která je "v převozu", použijeme dashed styl
+        if (inTransitSlotId.HasValue && slot.Id == inTransitSlotId.Value)
         {
             cls = "slot in-transit";
         }
-        else
-        {
-            cls = "slot occupied";
-        }
 
+        // popisek (název stolu), pokud je namapovaný
         labelBySlotId.TryGetValue(slot.Id, out label);
     }
 
@@ -92,10 +101,12 @@
     </div>
 }
 
+<!-- Název artiklu řady -->
 <div class="article-label small text-muted text-center mt-1">
     @row.Article
 </div>
 
+<!-- Zbytek fronty -->
 @if (remainingQueue.Any())
 {
     <div class="queue-label small text-muted text-center mt-1">

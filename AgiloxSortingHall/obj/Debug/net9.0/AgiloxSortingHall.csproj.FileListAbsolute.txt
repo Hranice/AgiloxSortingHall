@@ -149,7 +149,6 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Debug\n
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Debug\net9.0\runtimes\win-arm64\native\e_sqlite3.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Debug\net9.0\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Debug\net9.0\runtimes\win-x86\native\e_sqlite3.dll
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Debug\net9.0\publish\web.config
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Debug\net9.0\publish\AgiloxSortingHall.deps.json
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Debug\net9.0\publish\AgiloxSortingHall.runtimeconfig.json
@@ -225,4 +224,5 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\n
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\461pu80yc6-{0}-cr37bionm2-cr37bionm2.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\swae.build.ex.cache
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\exdf17do33-{0}-aqyys4gpsp-aqyys4gpsp.gz
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\exdf17do33-{0}-ivx9tef981-ivx9tef981.gz
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

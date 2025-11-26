@@ -5,17 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.WebHost.ConfigureKestrel(options =>
-//{
-//    // Naslouchat na všech IP (0.0.0.0) na portu 5044 – èisté HTTP
-//    options.ListenAnyIP(5044);
-
-//    options.ListenAnyIP(7002, listenOptions =>
-//    {
-//        listenOptions.UseHttps();
-//    });
-//});
-
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 // DbContext s SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -25,10 +15,25 @@ builder.Services.Configure<HallConfig>(
     builder.Configuration.GetSection("HallConfig"));
 builder.Services.AddTransient<DataSeeder>();
 
+var agiloxBaseUrl = builder.Configuration["Agilox:BaseUrl"]
+                     ?? throw new Exception("Missing Agilox BaseUrl in configuration");
+
+builder.Services.AddHttpClient("Agilox", client =>
+{
+    client.BaseAddress = new Uri(agiloxBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+
+builder.Services.AddScoped<AgiloxService>();
+
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 builder.Services.AddSignalR();
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -49,11 +54,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorPages()

@@ -1,0 +1,1 @@
+﻿curl -X POST "http://localhost:5000/agilox/callback" -H "Content-Type: application/json" -d "{\"row\":\"Řada3\",\"table\":\"Stůl 1\",\"requestId\":\"test\",\"serial\":123}"

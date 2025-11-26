@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "ContainingType": "AgiloxSortingHall.Controllers.AgiloxCallbackController",
+    "Method": "Callback",
+    "RelativePath": "agilox/callback",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "AgiloxSortingHall.Models.AgiloxCallbackDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

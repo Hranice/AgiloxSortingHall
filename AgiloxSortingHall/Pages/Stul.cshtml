@@ -27,26 +27,32 @@
                 <h2 class="mb-3">Čeká na doručení</h2>
 
                 <p class="fs-4 mb-1">
-                    Řada: <strong>@rowName</strong>
+                    Původ: <strong>@rowName</strong>
                 </p>
 
                 @if (!string.IsNullOrWhiteSpace(article))
                 {
                     <p class="fs-4">Artikl: <strong>@article</strong></p>
                 }
-                else
+
+                @if (!string.IsNullOrEmpty(call.RequestId))
                 {
-                    <p class="fs-5 text-muted">(Název artiklu není nastaven.)</p>
+                    <p class="fs-6 text-muted">
+                        ID požadavku: <code>@call.RequestId</code>
+                    </p>
                 }
+
+                <p class="fs-6 text-muted mt-3">
+                    Čeká se na potvrzení od Agiloxe…
+                </p>
             </div>
 
             <div class="d-flex flex-column gap-3 w-100" style="max-width: 400px;">
-                <form method="post" asp-page-handler="ConfirmDelivered">
-                    <button type="submit" class="btn btn-success btn-lg w-100 py-3">✅ Doručeno</button>
-                </form>
-
                 <form method="post" asp-page-handler="CancelCall">
-                    <button type="submit" class="btn btn-outline-danger btn-lg w-100 py-3">❌ Zrušit požadavek</button>
+                    <button type="submit"
+                            class="btn btn-outline-danger btn-lg w-100 py-3">
+                        ❌ Zrušit požadavek
+                    </button>
                 </form>
             </div>
         </div>

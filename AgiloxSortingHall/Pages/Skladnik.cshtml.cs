@@ -144,20 +144,43 @@ namespace AgiloxSortingHall.Pages
 
 
         /// <summary>
-        /// Znovu naète øady + doplní RowArticle podle aktuálního stavu DB
-        /// a vrátí Page() – používá se v chybových vìtvích POST handlerù.
+        /// Odebrání jedné palety z dané øady.
+        /// Odebírá se "shora" – slot s nejvyšším PositionIndex, který je obsazený.
+        /// Používá se pro opravu omylem pøidané palety.
         /// </summary>
-        private async Task<IActionResult> ReloadWithModelStateAsync()
+        public async Task<IActionResult> OnPostRemovePalletAsync(int rowId)
         {
-            Rows = await _db.HallRows
+            // Najdeme øadu i se sloty
+            var row = await _db.HallRows
                 .Include(r => r.Slots)
-                .OrderBy(r => r.Name)
-                .ToListAsync();
+                .FirstOrDefaultAsync(r => r.Id == rowId);
 
-            foreach (var r in Rows)
-                RowArticle[r.Id] = r.Article;
+            if (row == null)
+            {
+                ErrorMessage = "Øada nebyla nalezena.";
+                return RedirectToPage();
+            }
 
-            return Page();
+            var frontSlot = row.Slots
+                .Where(s => s.State == PalletState.Occupied)
+                .OrderBy(s => s.PositionIndex)
+                .FirstOrDefault();
+
+            if (frontSlot == null)
+            {
+                ErrorMessage = $"Øada {row.Name} nemá žádnou paletu k odebrání.";
+                return RedirectToPage();
+            }
+
+            // Slot vyprázdníme
+            frontSlot.State = PalletState.Empty;
+
+            await _db.SaveChangesAsync();
+            await _hub.Clients.All.SendAsync("HallUpdated");
+
+            return RedirectToPage();
         }
+
+
     }
 }
