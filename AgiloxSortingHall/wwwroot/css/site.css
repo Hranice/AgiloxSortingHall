@@ -1,132 +1,276 @@
 ﻿/**********************************************
- * GLOBALNÍ NASTAVENÍ (minimální)
+ * GLOBÁLNÍ NASTAVENÍ A BAREVNÉ SCHÉMA
  **********************************************/
 
-/* Defaultní velikost fontu (ponechána) */
+/* Základní font – trochu větší kvůli tabletům */
 html {
     font-size: 16px;
-}
-
-/* Minimální výška stránky */
-html {
     position: relative;
     min-height: 100%;
 }
 
+/* Žádný sticky footer, čisté pozadí */
 body {
-    margin-bottom: 60px; /* Bootstrap footer offset – můžeš klidně smazat */
+    margin-bottom: 0;
+    background: #f4f5fb; /* světlé neutrální pozadí */
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Bootstrap container-fluid má default padding – vypneme ho,
+   ať nám nekroutí výpočty z 100vw */
+.container-fluid.hall-page {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* CSS proměnné – snadná změna barev na jednom místě */
+:root {
+    --hall-bg: #f4f5fb;
+    --column-bg: #ffffff;
+    --column-border: #dde0f0;
+    --slot-border: #b4c3dd;
+    --slot-empty-bg: #ffffff;
+    --slot-occupied-bg: #cfe4ff;
+    --slot-intransit-bg: #eaf1ff;
+    --slot-label-color: #1f2933;
+    --queue-text-color: #6b7280;
+    --header-text: #111827;
+    --article-text: #4b5563;
+    --accent-primary: #2563eb;
+    --accent-primary-soft: rgba(37, 99, 235, 0.12);
 }
 
 
 
 /**********************************************
- * LAYOUT STRÁNKY HALY (Skladník i Stůl)
+ * LAYOUT STRÁNKY HALY (Skladník & Stůl)
  **********************************************/
 
-/* Obal stránky – sloupce se musí roztáhnout na výšku okna */
+/* Kořenový kontejner stránky vizualizace */
 .hall-page {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    /* proměnné pro výpočet velikosti slotů */
-    --slot-count: 5;
-    --vertical-reserved: 320px;
-    --slot-size: calc((100vh - var(--vertical-reserved)) / var(--slot-count));
+    background: var(--hall-bg);
+    /* Proměnné:
+       - --slot-count        = počet pozic ve sloupci (nastaví Razor)
+       - --column-count      = počet sloupců / řad (nastaví Razor)
+       - --horizontal-padding= levý/pravý padding celé mřížky
+       - --column-gap        = mezera mezi sloupci
+    */
+    --slot-count: 3;
+    --column-count: 9;
+    --horizontal-padding: 32px;
+    --column-gap: 16px;
+    /* šířka jednoho SLOUPCE:
+       (šířka okna - paddingy - mezery) / počet sloupců
+       → tj. přesně se vejde do šířky obrazovky, bez overflow */
+    --column-width: calc( (100vw - 2 * var(--horizontal-padding)
+               - (var(--column-count) - 1) * var(--column-gap)) / var(--column-count) );
 }
 
-
-/**********************************************
- * MŘÍŽKA SLOUPCŮ
- **********************************************/
-
-/* Kontejner s jednotlivými sloupci */
+/* Kontejner všech sloupců (řad) */
 .hall-columns-container {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    overflow-x: auto; /* scroll na mobilu */
-    gap: 16px;
-    flex: 1 1 auto; /* zabere zbytek výšky */
-    padding-bottom: 8px;
+    flex: 1 1 auto;
+    padding: 8px var(--horizontal-padding) 16px;
+    gap: var(--column-gap);
+    overflow-x: auto; /* na menších šířkách může být scroll */
+    scroll-snap-type: x mandatory;
 }
 
-/* Jeden sloupec */
+/* Jeden sloupec = jedna řada */
 .hall-column {
     display: flex;
     flex-direction: column;
-    flex: 0 0 120px; /* šířka na mobilu */
+    /* šířka sloupce přímo z proměnné – včetně paddingu+borderu */
+    flex: 0 0 var(--column-width);
+    max-width: var(--column-width);
+    background: var(--column-bg);
+    border-radius: 12px;
+    border: 1px solid var(--column-border);
+    padding: 8px 6px 10px;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+    scroll-snap-align: start;
 }
+
+/* Sloupec jako tlačítko (na stránce stolů) */
+.column-button {
+    border-radius: 10px !important;
+    border-width: 0 !important;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: inherit;
+}
+
+    /* Lehký highlight při tapnutí / hoveru */
+    .column-button:hover,
+    .column-button:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--accent-primary-soft);
+    }
+
+    /* Neaktivní / disabled stav – např. pokud už má stůl pending call */
+    .column-button.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
 
 
 /**********************************************
- * SLOTY (palety)
+ * HLAVIČKY ŘAD A POPISKY
  **********************************************/
 
-/* Jeden čtvereček slotu – velikost se vypočte z výšky obrazovky */
-.slot {
-    width: var(--slot-size);
-    height: var(--slot-size);
-    border: 3px solid;
-    box-sizing: border-box;
+/* Název řady (Řada1, Řada2, ...) */
+.header-cell {
+    font-weight: 600;
+    color: var(--header-text);
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-    /* Stav prázdného slotu */
+/* Název artiklu pod sloupcem */
+.article-label {
+    color: var(--article-text);
+    font-size: 0.78rem;
+    text-align: center;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Text „fronta: Stůl 1, Stůl 2…“ */
+.queue-label {
+    min-height: 1.3rem;
+    color: var(--queue-text-color);
+    font-size: 0.72rem;
+    text-align: center;
+    margin-top: 3px;
+    padding: 0 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+/**********************************************
+ * SLOTY (PALETY) – VZHLED A STAVY
+ **********************************************/
+
+/* Slot = ČTVEREC:
+   - šířka 100 % sloupce (uvnitř paddingu)
+   - aspect-ratio: 1/1 → prohlížeč dopočítá výšku = šířka
+   - funguje na libovolném poměru stran (16:9, 16:10, 4:3, …) */
+.slot {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    border: 2px solid var(--slot-border);
+    box-sizing: border-box;
+    border-radius: 10px;
+    overflow: hidden;
+    background-clip: padding-box;
+    position: relative;
+}
+
+    /* Stav prázdné pozice */
     .slot.empty {
-        background-color: #fff;
+        background-color: var(--slot-empty-bg);
     }
 
     /* Běžně obsazená paleta */
     .slot.occupied {
-        background-color: #d0e8ff;
+        background-color: var(--slot-occupied-bg);
     }
 
-    /* Slot v převozu (Agilox order běží) */
+    /* Paleta, na kterou běží Agilox order */
     .slot.in-transit {
+        background-color: var(--slot-intransit-bg);
         border-style: dashed;
     }
 
-/* Wrapper – zarovná slot na střed sloupce */
+/* Wrapper kvůli centrování slotu ve sloupci */
 .slot-wrapper {
     display: flex;
     justify-content: center;
 }
 
 
+
 /**********************************************
- * POPISKY, HLAVIČKY A FRONTY
+ * TEXT UVNITŘ SLOTŮ (NÁZEV STOLU)
  **********************************************/
 
-/* Text uvnitř slotu – název stolu */
+/* Label uvnitř slotu, typicky „Stůl 1“ nebo „▶ Stůl 1“ */
 .slot-label {
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--slot-label-color);
     padding: 4px;
     width: 100%;
     height: 100%;
+    line-height: 1.1;
+    overflow: hidden;
 }
 
-/* Text „fronta: Stůl X, …“ – malý mezní prostor */
-.queue-label {
-    min-height: 1.2rem;
-}
 
 
 /**********************************************
- * RESPONZIVITA – PC layout
+ * STAV „ČEKACÍ“ OBRAZOVKY PRO STŮL
  **********************************************/
 
-/* Na PC roztáhnout vizualizaci do šířky */
-@media (min-width: 992px) {
-    .hall-columns-container {
-        overflow-x: visible; /* žádný horizontální scroll */
-        justify-content: space-evenly;
+.hall-wait {
+    min-height: calc(100vh - 80px);
+    padding: 16px;
+}
+
+    /* Na tabletu ať je text přehledný a tlačítka velká */
+    .hall-wait h2 {
+        font-size: 1.4rem;
     }
 
-    .hall-column {
-        flex: 1 1 0; /* rovnoměrné rozložení */
-        max-width: 180px;
+    .hall-wait p.fs-4 {
+        font-size: 1.2rem !important;
+    }
+
+    .hall-wait .btn-lg {
+        font-size: 1rem;
+    }
+
+
+
+/**********************************************
+ * RESPONSIVITA – TABLET / PC
+ **********************************************/
+
+/* 768–1199px – tablet na výšku / menší šířka.
+   Sloupce necháme scrollovat zleva doprava. */
+@media (max-width: 1199.98px) {
+    .hall-columns-container {
+        justify-content: flex-start;
+    }
+}
+
+/* 1200px a víc – 11" tablet na šířku / PC.
+   Sloupce centrované, žádný horizontální scroll navíc (pokud se vejdou). */
+@media (min-width: 1200px) {
+    .hall-columns-container {
+        justify-content: center;
+        overflow-x: visible;
     }
 }

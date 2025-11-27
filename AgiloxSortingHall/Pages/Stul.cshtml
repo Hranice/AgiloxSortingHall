@@ -9,9 +9,10 @@
 
     // Zjištění maximální kapacity mezi všemi řadami – slouží pro CSS grid layout
     var maxCapacity = Model.Rows.Max(r => r.Capacity);
+    var columnCount = Model.Rows.Count;
 }
 
-<div class="container-fluid hall-page" style="--slot-count:@maxCapacity;">
+<div class="container-fluid hall-page" style="--slot-count:@maxCapacity; --column-count:@columnCount;">
 
     <div class="row">
         <div class="col-12 d-flex justify-content-between align-items-center my-3">
