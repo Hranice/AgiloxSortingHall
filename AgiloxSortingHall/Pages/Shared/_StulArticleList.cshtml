@@ -1,0 +1,56 @@
+﻿@using AgiloxSortingHall.Models
+@using AgiloxSortingHall.ViewModels
+@model AgiloxSortingHall.Pages.StulModel
+
+@{
+    // Seskupíme řady podle artiklu
+    var articleGroups = Model.Rows
+        .Where(r => !string.IsNullOrWhiteSpace(r.Article))
+        .GroupBy(r => r.Article)
+        .OrderBy(g => g.Key)
+        .ToList();
+
+    // Pro případ, že by některé řady měly prázdný artikl, dá se vždy
+    // zvlášť zobrazit i ta skupina (teď ji ignorujeme).
+}
+
+<div class="container-fluid px-3 py-2">
+    @if (!articleGroups.Any())
+    {
+        <p class="text-muted">
+            Žádné artikly nejsou k dispozici.
+        </p>
+    }
+    else
+    {
+        <div class="row g-2">
+            @foreach (var group in articleGroups)
+            {
+                // Spočítáme celkový počet fyzicky obsazených palet
+                // pro daný artikl (přes všechny řady).
+                var palletCount = group
+                .SelectMany(r => r.Slots)
+                .Count(s => s.State == PalletState.Occupied);
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <form method="post" asp-page-handler="CallArticle" class="h-100">
+                        <input type="hidden" name="id" value="@Model.Table.Id" />
+                        <input type="hidden" name="article" value="@group.Key" />
+
+                        <button type="submit"
+                                class="btn btn-light border w-100 text-start stul-article-btn">
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold">
+                                    @group.Key
+                                </span>
+                                <small class="text-muted">
+                                    Palet fyzicky přítomno: <strong>@palletCount</strong>
+                                </small>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+    }
+</div>

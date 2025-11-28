@@ -50,14 +50,28 @@ namespace AgiloxSortingHall.Pages
         public List<RowCall> PendingCalls { get; set; } = new();
 
         /// <summary>
+        /// Aktuálně zvolený režim zobrazení (rows / articles).
+        /// </summary>
+        public string ViewMode { get; set; } = "rows";
+
+        /// <summary>
         /// Načte data pro stránku stolu: konkrétní stůl, všechny řady,
         /// aktuální čekající call daného stolu a všechny pending call-y
         /// pro zobrazení stavu fronty.
         /// </summary>
-        public async Task<IActionResult> OnGetAsync(int id)
+        public async Task<IActionResult> OnGetAsync(int id, string? view)
         {
             Table = await _db.WorkTables.FindAsync(id)
                 ?? throw new Exception("Stůl nenalezen");
+
+            if (string.Equals(view, "articles", StringComparison.OrdinalIgnoreCase))
+            {
+                ViewMode = "articles";
+            }
+            else
+            {
+                ViewMode = "rows";
+            }
 
             Rows = await _db.HallRows
                 .Include(r => r.Slots)
@@ -71,11 +85,10 @@ namespace AgiloxSortingHall.Pages
                 .FirstOrDefaultAsync();
 
             PendingCalls = await _db.RowCalls
-            .Include(c => c.WorkTable)
-            .Where(c => c.Status == RowCallStatus.Pending)
-            .OrderBy(c => c.RequestedAt)
-            .ToListAsync();
-
+                .Include(c => c.WorkTable)
+                .Where(c => c.Status == RowCallStatus.Pending)
+                .OrderBy(c => c.RequestedAt)
+                .ToListAsync();
 
             return Page();
         }
@@ -117,6 +130,57 @@ namespace AgiloxSortingHall.Pages
 
             // pokusíme se pro tuto řadu ihned spustit workflow,
             // pokud je k dispozici volná paleta
+            await TryDispatchAgiloxForRowAsync(row, table);
+
+            await _hub.Clients.All.SendAsync("HallUpdated");
+
+            return RedirectToPage(new { id });
+        }
+
+        /// <summary>
+        /// Zavolání "artiklu" – uživatel neřeší konkrétní řadu,
+        /// jen řekne "chci tento artikl". Backend si vybere nějakou řadu
+        /// s tímto artiklem (zatím bereme první podle názvu).
+        /// </summary>
+        public async Task<IActionResult> OnPostCallArticleAsync(int id, string article)
+        {
+            // stůl může mít jen jeden pending call
+            bool alreadyPending = await _db.RowCalls
+                .AnyAsync(c => c.WorkTableId == id && c.Status == RowCallStatus.Pending);
+
+            if (alreadyPending)
+                return RedirectToPage(new { id });
+
+            var table = await _db.WorkTables.FindAsync(id);
+            if (table == null)
+                return RedirectToPage(new { id });
+
+            // najdeme všechny řady s daným artiklem
+            var rowsForArticle = await _db.HallRows
+                .Include(r => r.Slots)
+                .Where(r => r.Article == article)
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            if (!rowsForArticle.Any())
+            {
+                return RedirectToPage(new { id });
+            }
+
+            // TODO: lepší logika výběru řady (náhodně? round-robin?)
+            var row = rowsForArticle.First();
+
+            var call = new RowCall
+            {
+                WorkTableId = id,
+                HallRowId = row.Id,
+                Status = RowCallStatus.Pending,
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _db.RowCalls.Add(call);
+            await _db.SaveChangesAsync();
+
             await TryDispatchAgiloxForRowAsync(row, table);
 
             await _hub.Clients.All.SendAsync("HallUpdated");
