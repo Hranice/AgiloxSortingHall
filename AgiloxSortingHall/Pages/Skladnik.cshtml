@@ -16,18 +16,22 @@
 
     <div class="row">
         <div class="col-12">
-            @* Hlavička s názvem a hamburgerem pro nastavení *@
+            @* Hlavička s názvem a tlačítkem pro nastavení *@
             <div class="d-flex justify-content-between align-items-center my-3">
-                <h1 class="mb-0">Skladník</h1>
+                <h1 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-person-gear me-2"></i>
+                    Skladník
+                </h1>
 
-                @* Hambáč, který jen rozbaluje/sbalí panel s nastavením *@
-                <button class="btn btn-outline-secondary btn-sm"
+                @* Tlačítko, které rozbaluje/sbalí panel s nastavením *@
+                <button class="btn btn-outline-secondary btn-lg d-flex align-items-center px-3 py-2"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#settingsPanel"
                         aria-expanded="false"
                         aria-controls="settingsPanel">
-                    ☰ Nastavení
+                    <i class="bi bi-gear-wide-connected me-2 fs-4"></i>
+                    <span class="fs-5">Nastavení</span>
                 </button>
             </div>
         </div>
@@ -48,8 +52,9 @@
         <div class="col-12">
             <div class="collapse" id="settingsPanel">
                 <div class="card my-2">
-                    <div class="card-header">
-                        Nastavení výběru řady pro artikly (používají stoly)
+                    <div class="card-header d-flex align-items-center">
+                        <i class="bi bi-sliders me-2"></i>
+                        <span>Nastavení výběru řady pro artikly (používají stoly)</span>
                     </div>
                     <div class="card-body">
                         <form method="post" asp-page-handler="SetRowSelectionStrategy" class="mb-0">
@@ -128,37 +133,99 @@
                         })
 
             @* Formulář pro manipulaci s danou řadou *@
-            <form method="post" class="w-100 mt-2">
+            <form method="post" class="w-100 mt-2" id="row-form-@row.Id">
                 <input type="hidden" name="rowId" value="@row.Id" />
 
                 <div class="input-group mb-2">
                     <input type="text"
-                           class="form-control"
+                           class="form-control form-control-lg"
                            placeholder="Název artiklu"
                            name="RowArticle[@row.Id]"
                            value="@(Model.RowArticle[row.Id])" />
 
-                    <button class="btn btn-outline-primary btn-lg"
+                    <button class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center"
                             type="submit"
                             asp-page-handler="SetArticle">
-                        💾
+                        <i class="bi bi-pencil fs-4"></i>
                     </button>
                 </div>
 
-                <button class="btn btn-success btn-lg w-100 py-3 fw-bold"
+                <button class="btn btn-success btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center"
                         type="submit"
                         asp-page-handler="AddPallet">
-                    +1
+                    <i class="bi bi-plus-lg me-2"></i>
+                    <span>+1</span>
                 </button>
 
-                <button class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold mt-2"
-                        type="submit"
-                        asp-page-handler="RemovePallet"
-                        onclick="return confirm('Opravdu odebrat jednu paletu z této řady?');">
-                    -1
+                @* Odebrání palety – otevře potvrzovací modal *@
+                <button class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold mt-2 d-flex align-items-center justify-content-center"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmRemoveModal"
+                        data-form-id="row-form-@row.Id">
+                    <i class="bi bi-dash-lg me-2"></i>
+                    <span>-1</span>
                 </button>
             </form>
         </div>
                 }
     </div>
 </div>
+
+@* Bootstrap modal pro potvrzení odebrání palety *@
+<div class="modal fade" id="confirmRemoveModal" tabindex="-1" aria-labelledby="confirmRemoveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center" id="confirmRemoveModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                    Odebrat paletu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">
+                    Opravdu chceš odebrat jednu paletu z této řady?
+                </p>
+                <p class="text-muted small mb-0">
+                    Akce je určena pro opravu omylem přidané palety. Neovlivní běžící požadavky na Agiloxe,
+                    pouze změní počet fyzicky evidovaných palet v řadě.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Zrušit
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveBtn">
+                    Odebrat paletu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var confirmModal = document.getElementById('confirmRemoveModal');
+            var formIdToSubmit = null;
+
+            // Když se modal otevírá, vezmeme z tlačítka id formuláře
+            confirmModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                formIdToSubmit = button ? button.getAttribute('data-form-id') : null;
+            });
+
+            // Po potvrzení v modalu odešleme daný formulář
+            var confirmButton = document.getElementById('confirmRemoveBtn');
+            confirmButton.addEventListener('click', function () {
+                if (formIdToSubmit) {
+                    var form = document.getElementById(formIdToSubmit);
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            });
+        });
+    </script>
+}
