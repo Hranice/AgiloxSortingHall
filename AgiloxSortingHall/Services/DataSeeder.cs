@@ -41,26 +41,22 @@ namespace AgiloxSortingHall.Services
         /// </summary>
         public async Task SeedAsync()
         {
-            // Řady (HallRows)
             foreach (var rowCfg in _config.Rows)
             {
-                // pokusíme se najít existující řadu se stejným Name
                 var row = await _db.HallRows
                     .Include(r => r.Slots)
                     .FirstOrDefaultAsync(r => r.Name == rowCfg.Name);
 
                 if (row == null)
                 {
-                    // Řada neexistuje -> vytvoříme novou
+                    // vytvoření nové řady
                     row = new HallRow
                     {
                         Name = rowCfg.Name,
                         ColorHex = rowCfg.ColorHex,
-                        Capacity = rowCfg.Capacity,
-                        Slots = new List<PalletSlot>()
+                        Capacity = rowCfg.Capacity
                     };
 
-                    // vytvoříme sloty 0 .. Capacity-1
                     for (int i = 0; i < rowCfg.Capacity; i++)
                     {
                         row.Slots.Add(new PalletSlot
@@ -74,45 +70,34 @@ namespace AgiloxSortingHall.Services
                 }
                 else
                 {
-                    // Řada existuje -> aktualizujeme ji podle configu
-
-                    // barva podle configu
+                    // aktualizace existující řady = synchronizace kapacity
                     row.ColorHex = rowCfg.ColorHex;
+                    row.Capacity = rowCfg.Capacity;
 
-                    // pokud se změnila kapacita, upravíme i sloty
-                    if (row.Capacity != rowCfg.Capacity)
+                    // Odstranit sloty navíc
+                    var extraSlots = row.Slots
+                        .Where(s => s.PositionIndex >= rowCfg.Capacity)
+                        .ToList();
+
+                    if (extraSlots.Any())
+                        _db.PalletSlots.RemoveRange(extraSlots);
+
+                    // Přidat chybějící sloty
+                    for (int i = 0; i < rowCfg.Capacity; i++)
                     {
-                        var oldCapacity = row.Capacity;
-                        var newCapacity = rowCfg.Capacity;
-                        row.Capacity = newCapacity;
-
-                        // aktuální počet slotů v DB
-                        var currentSlots = row.Slots.ToList();
-
-                        // zvýšení kapacity -> přidáme chybějící sloty
-                        if (newCapacity > currentSlots.Count)
+                        if (!row.Slots.Any(s => s.PositionIndex == i))
                         {
-                            for (int i = currentSlots.Count; i < newCapacity; i++)
+                            row.Slots.Add(new PalletSlot
                             {
-                                row.Slots.Add(new PalletSlot
-                                {
-                                    PositionIndex = i,
-                                    State = PalletState.Empty
-                                });
-                            }
-                        }
-                        // snížení kapacity -> odstraníme sloty s PositionIndex >= newCapacity
-                        else if (newCapacity < currentSlots.Count)
-                        {
-                            var toRemove = currentSlots
-                                .Where(s => s.PositionIndex >= newCapacity)
-                                .ToList();
-
-                            _db.PalletSlots.RemoveRange(toRemove);
+                                PositionIndex = i,
+                                State = PalletState.Empty
+                            });
                         }
                     }
                 }
             }
+
+            await _db.SaveChangesAsync();
 
             // Stoly (WorkTables)
             foreach (var tblCfg in _config.Tables)
