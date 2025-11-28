@@ -4,17 +4,46 @@
     ViewData["Title"] = "Výběr stolu";
 }
 
-<h1>Agilox Sorting Hall</h1>
-<p>Vyber stůl:</p>
+<div class="container py-4">
 
-<ul>
-    @foreach (var t in Model.Tables)
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold m-0">AGILOX NA HALE TŘÍDĚNÍ</h1>
+        <span class="text-muted fs-5">Vyber stůl</span>
+    </div>
+
+    @if (!Model.Tables.Any())
     {
-        <li>
-            <a asp-page="/Stul" asp-route-id="@t.Id">@t.Name</a>
-        </li>
+        <div class="alert alert-info">
+            Žádné stoly nejsou k dispozici.
+        </div>
     }
-</ul>
+    else
+    {
+        <div class="row g-3">
 
-<p>Pro skladníka:</p>
-<a asp-page="/Skladnik">Obrazovka skladníka</a>
+            @foreach (var t in Model.Tables)
+            {
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
+                    <a asp-page="/Stul" asp-route-id="@t.Id"
+                       class="btn btn-light border rounded flex-fill p-4 text-start fs-3 fw-semibold d-flex flex-column">
+
+                        <span>@t.Name</span>
+                        <span class="text-muted fs-6 mt-2">Klikni pro otevření</span>
+
+                    </a>
+                </div>
+            }
+
+        </div>
+    }
+
+    <hr class="my-4" />
+
+    <div class="d-flex justify-content-start">
+        <a asp-page="/Skladnik"
+           class="btn btn-outline-primary btn-lg px-4 py-3 fs-4">
+            Obrazovka skladníka
+        </a>
+    </div>
+
+</div>
