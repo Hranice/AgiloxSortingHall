@@ -25,10 +25,15 @@ namespace AgiloxSortingHall.Pages
             _httpClientFactory = httpClientFactory;
         }
 
+        /// <summary>
+        /// Všechny øady v hale (pro vizualizaci i pro manipulaci).
+        /// </summary>
         public List<HallRow> Rows { get; set; } = new();
 
-        // Hodnota textového pole pro každou øadu
-        // klíè = Id øady, hodnota = název artiklu, který je zadaný v textboxu
+        /// <summary>
+        /// Hodnota textového pole pro každou øadu
+        /// (klíè = Id øady, hodnota = název artiklu, který je zadaný v textboxu).
+        /// </summary>
         [BindProperty]
         public Dictionary<int, string?> RowArticle { get; set; } = new();
 
@@ -38,10 +43,18 @@ namespace AgiloxSortingHall.Pages
         /// </summary>
         public List<RowCall> PendingCalls { get; set; } = new();
 
+        /// <summary>
+        /// Aktuálnì použitá strategie výbìru øady pro artikly,
+        /// kterou nastavuje skladník.
+        /// </summary>
+        public RowSelectionStrategy CurrentStrategy { get; set; } = RowSelectionStrategy.MostFreePallets;
 
         [TempData]
         public string? ErrorMessage { get; set; }
 
+        /// <summary>
+        /// Naètení stránky skladníka – øady, pending call-y a nastavení haly.
+        /// </summary>
         public async Task OnGetAsync()
         {
             Rows = await _db.HallRows
@@ -54,13 +67,30 @@ namespace AgiloxSortingHall.Pages
                 RowArticle[r.Id] = r.Article;
             }
 
+            // Všechny pending call-y pro vizualizaci fronty
             PendingCalls = await _db.RowCalls
                 .Include(c => c.WorkTable)
                 .Where(c => c.Status == RowCallStatus.Pending)
                 .OrderBy(c => c.RequestedAt)
                 .ToListAsync();
-        }
 
+            var settings = await _db.HallSettings.FirstOrDefaultAsync();
+
+            if (settings == null)
+            {
+                // Pokud nastavení ještì neexistuje, založíme defaultní øádek
+                settings = new HallSettings
+                {
+                    Id = 1,
+                    RowSelectionStrategy = RowSelectionStrategy.MostFreePallets
+                };
+
+                _db.HallSettings.Add(settings);
+                await _db.SaveChangesAsync();
+            }
+
+            CurrentStrategy = settings.RowSelectionStrategy;
+        }
 
         /// <summary>
         /// Uložení / zmìna názvu artiklu pro danou øadu.
@@ -104,7 +134,9 @@ namespace AgiloxSortingHall.Pages
             return RedirectToPage();
         }
 
-
+        /// <summary>
+        /// Pøidání jedné palety do dané øady (do nejbližšího volného slotu).
+        /// </summary>
         public async Task<IActionResult> OnPostAddPalletAsync(int rowId)
         {
             var row = await _db.HallRows
@@ -122,6 +154,7 @@ namespace AgiloxSortingHall.Pages
                 return RedirectToPage();
             }
 
+            // vezmeme "nejvyšší" volný slot (nejblíž ke skladníkovi)
             var emptySlot = row.Slots
                 .Where(s => s.State == PalletState.Empty)
                 .OrderByDescending(s => s.PositionIndex)
@@ -153,6 +186,7 @@ namespace AgiloxSortingHall.Pages
             // spoèítáme obsazené sloty
             var occupiedCount = row.Slots.Count(s => s.State == PalletState.Occupied);
 
+            // kolik pending callù už má requestId (tj. rozjetý Agilox)
             var dispatchedCount = await _db.RowCalls
                 .Where(c => c.HallRowId == row.Id &&
                             c.Status == RowCallStatus.Pending &&
@@ -201,10 +235,9 @@ namespace AgiloxSortingHall.Pages
                 row.Name, callToDispatch.WorkTable.Name, requestId);
         }
 
-
         /// <summary>
         /// Odebrání jedné palety z dané øady.
-        /// Odebírá se "shora" – slot s nejvyšším PositionIndex, který je obsazený.
+        /// Odebírá se "shora" – slot s nejnižším PositionIndex, který je obsazený.
         /// Používá se pro opravu omylem pøidané palety.
         /// </summary>
         public async Task<IActionResult> OnPostRemovePalletAsync(int rowId)
@@ -240,6 +273,30 @@ namespace AgiloxSortingHall.Pages
             return RedirectToPage();
         }
 
+        /// <summary>
+        /// Skladník zmìní strategii výbìru øady (radio buttony na UI).
+        /// Tuto strategii pak používají stoly pøi volání artiklu.
+        /// </summary>
+        public async Task<IActionResult> OnPostSetRowSelectionStrategyAsync(RowSelectionStrategy strategy)
+        {
+            var settings = await _db.HallSettings.FirstOrDefaultAsync();
 
+            if (settings == null)
+            {
+                settings = new HallSettings
+                {
+                    Id = 1
+                };
+                _db.HallSettings.Add(settings);
+            }
+
+            settings.RowSelectionStrategy = strategy;
+
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Skladník – zmìnìna RowSelectionStrategy na {Strategy}", strategy);
+
+            return RedirectToPage();
+        }
     }
 }

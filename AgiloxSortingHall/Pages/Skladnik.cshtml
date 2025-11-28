@@ -8,7 +8,7 @@
     ViewData["Title"] = "Skladník";
 
     // Zjištění největší kapacity řad – používá se pro CSS grid
-    var maxCapacity = Model.Rows.Max(r => r.Capacity);
+    var maxCapacity = Model.Rows.Any() ? Model.Rows.Max(r => r.Capacity) : 0;
     var columnCount = Model.Rows.Count;
 }
 
@@ -30,6 +30,71 @@
         </div>
     }
 
+    @* Panel pro nastavení strategie výběru řady (globální pro celou halu) *@
+    <div class="row">
+        <div class="col-12">
+            <div class="card my-2">
+                <div class="card-header">
+                    Nastavení výběru řady pro artikly (používají stoly)
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="SetRowSelectionStrategy" class="mb-0">
+
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="strategy"
+                                   id="strategyMostFree"
+                                   value="MostFreePallets"
+                                   @(Model.CurrentStrategy == RowSelectionStrategy.MostFreePallets ? "checked" : "") />
+                            <label class="form-check-label" for="strategyMostFree">
+                                Nejvíc volných palet
+                                <small class="text-muted d-block">
+                                    Vybere řadu s daným artiklem, kde je nejvíc volných palet
+                                    (obsazené sloty mínus už odeslané call-y na Agiloxe).
+                                </small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mt-2">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="strategy"
+                                   id="strategyLeft"
+                                   value="NearestLeft"
+                                   @(Model.CurrentStrategy == RowSelectionStrategy.NearestLeft ? "checked" : "") />
+                            <label class="form-check-label" for="strategyLeft">
+                                Nejblíž vlevo
+                                <small class="text-muted d-block">
+                                    Vždy bere řadu nejvíc vlevo (podle pořadí řad v hale).
+                                </small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mt-2">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="strategy"
+                                   id="strategyRight"
+                                   value="NearestRight"
+                                   @(Model.CurrentStrategy == RowSelectionStrategy.NearestRight ? "checked" : "") />
+                            <label class="form-check-label" for="strategyRight">
+                                Nejblíž vpravo
+                                <small class="text-muted d-block">
+                                    Vždy bere řadu nejvíc vpravo (podle pořadí řad v hale).
+                                </small>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm mt-3">
+                            Uložit nastavení
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @* Kontejner se všemi sloupci (řadami v hale) *@
     <div class="hall-columns-container">
 
@@ -43,7 +108,7 @@
                    - volné sloty
                    - pending call-y
                    - kapacita
-                   
+
                    Tento partial používá jednotný vzhled i s view stolu.
                 *@
                 @await Html.PartialAsync(

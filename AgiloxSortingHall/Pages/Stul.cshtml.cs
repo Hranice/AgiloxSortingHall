@@ -155,25 +155,53 @@ namespace AgiloxSortingHall.Pages
             if (table == null)
                 return RedirectToPage(new { id });
 
-            // najdeme všechny řady s daným artiklem
             var rowsForArticle = await _db.HallRows
                 .Include(r => r.Slots)
                 .Where(r => r.Article == article)
-                .OrderBy(r => r.Name)
+                .OrderBy(r => r.Name)  // definujeme tím "zleva doprava"
                 .ToListAsync();
 
             if (!rowsForArticle.Any())
             {
+                // žádná řada s tímto artiklem
                 return RedirectToPage(new { id });
             }
 
-            // TODO: lepší logika výběru řady (náhodně? round-robin?)
-            var row = rowsForArticle.First();
+            var settings = await _db.HallSettings.FirstOrDefaultAsync();
+            var strategy = settings?.RowSelectionStrategy ?? RowSelectionStrategy.MostFreePallets;
 
+            HallRow selectedRow;
+
+            switch (strategy)
+            {
+                case RowSelectionStrategy.NearestLeft:
+                    // nejbližší vlevo -> první v seřazeném seznamu
+                    selectedRow = rowsForArticle.First();
+                    break;
+
+                case RowSelectionStrategy.NearestRight:
+                    // nejbližší vpravo -> poslední v seřazeném seznamu
+                    selectedRow = rowsForArticle.Last();
+                    break;
+
+                case RowSelectionStrategy.MostFreePallets:
+                default:
+                    // spočteme volné palety pro každou řadu a vezmeme tu s největším počtem
+                    var availableDict = await GetAvailablePalletsForRowsAsync(rowsForArticle);
+
+                    // seřadíme podle: nejvíc volných, při shodě "nejvíc vlevo"
+                    selectedRow = rowsForArticle
+                        .OrderByDescending(r => availableDict.ContainsKey(r.Id) ? availableDict[r.Id] : 0)
+                        .ThenBy(r => r.Name)
+                        .First();
+                    break;
+            }
+
+            // vytvoříme call do vybrané řady
             var call = new RowCall
             {
                 WorkTableId = id,
-                HallRowId = row.Id,
+                HallRowId = selectedRow.Id,
                 Status = RowCallStatus.Pending,
                 RequestedAt = DateTime.UtcNow
             };
@@ -181,7 +209,8 @@ namespace AgiloxSortingHall.Pages
             _db.RowCalls.Add(call);
             await _db.SaveChangesAsync();
 
-            await TryDispatchAgiloxForRowAsync(row, table);
+            // zkusíme rovnou spustit workflow
+            await TryDispatchAgiloxForRowAsync(selectedRow, table);
 
             await _hub.Clients.All.SendAsync("HallUpdated");
 
@@ -361,5 +390,51 @@ namespace AgiloxSortingHall.Pages
 
             return RedirectToPage(new { id });
         }
+
+        /// <summary>
+        /// Vrátí počet "volných" palet v dané řadě – tj.
+        /// počet fyzicky obsazených slotů mínus počet callů pro tuto řadu,
+        /// které už mají přiřazené RequestId (Agilox).
+        /// </summary>
+        private async Task<Dictionary<int, int>> GetAvailablePalletsForRowsAsync(IEnumerable<HallRow> rows)
+        {
+            // seznam Id všech řad, které nás zajímají
+            var rowIds = rows.Select(r => r.Id).ToList();
+
+            // spočítáme dispatched call-y pro každou řadu, kterou řešíme
+            var dispatchedPerRow = await _db.RowCalls
+                .Where(c => rowIds.Contains(c.HallRowId) &&
+                            c.Status == RowCallStatus.Pending &&
+                            c.RequestId != null)
+                .GroupBy(c => c.HallRowId)
+                .Select(g => new
+                {
+                    RowId = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            var dispatchedDict = dispatchedPerRow.ToDictionary(x => x.RowId, x => x.Count);
+
+            var result = new Dictionary<int, int>();
+
+            foreach (var row in rows)
+            {
+                // fyzicky obsazené sloty = palety v řadě
+                var occupiedCount = row.Slots.Count(s => s.State == PalletState.Occupied);
+
+                // kolik z nich už je rozebráno Agiloxem (dispatched call-y)
+                dispatchedDict.TryGetValue(row.Id, out var dispatchedCount);
+
+                var available = occupiedCount - dispatchedCount;
+                if (available < 0)
+                    available = 0; // pro jistotu, kdyby se to někdy rozjelo
+
+                result[row.Id] = available;
+            }
+
+            return result;
+        }
+
     }
 }
