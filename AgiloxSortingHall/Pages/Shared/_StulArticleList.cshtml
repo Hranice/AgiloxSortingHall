@@ -23,7 +23,7 @@
     }
     else
     {
-        <div class="row g-2">
+        <div class="row g-3">
             @foreach (var group in articleGroups)
             {
                 // Spočítáme celkový počet fyzicky obsazených palet
@@ -32,20 +32,22 @@
                 .SelectMany(r => r.Slots)
                 .Count(s => s.State == PalletState.Occupied);
 
-                <div class="col-12 col-md-6 col-lg-4">
-                    <form method="post" asp-page-handler="CallArticle" class="h-100">
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
+                    <form method="post"
+                          asp-page-handler="CallArticle"
+                          class="d-flex flex-fill">
                         <input type="hidden" name="id" value="@Model.Table.Id" />
                         <input type="hidden" name="article" value="@group.Key" />
 
                         <button type="submit"
-                                class="btn btn-light border w-100 text-start stul-article-btn">
+                                class="btn btn-light border flex-fill p-4 text-start fs-3">
                             <div class="d-flex flex-column">
-                                <span class="fw-semibold">
+                                <span class="fw-semibold mb-2">
                                     @group.Key
                                 </span>
-                                <small class="text-muted">
+                                <span class="text-muted fs-5">
                                     Palet fyzicky přítomno: <strong>@palletCount</strong>
-                                </small>
+                                </span>
                             </div>
                         </button>
                     </form>

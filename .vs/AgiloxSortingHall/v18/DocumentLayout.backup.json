@@ -3,16 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|c:\\users\\jprochazka\\source\\repos\\agiloxsortinghall\\agiloxsortinghall\\pages\\shared\\_stularticlelist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|solutionrelative:agiloxsortinghall\\pages\\shared\\_stularticlelist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|c:\\users\\jprochazka\\source\\repos\\agiloxsortinghall\\agiloxsortinghall\\pages\\skladnik.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|solutionrelative:agiloxsortinghall\\pages\\skladnik.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|c:\\users\\jprochazka\\source\\repos\\agiloxsortinghall\\agiloxsortinghall\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|solutionrelative:agiloxsortinghall\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|c:\\users\\jprochazka\\source\\repos\\agiloxsortinghall\\agiloxsortinghall\\pages\\stul.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|solutionrelative:agiloxsortinghall\\pages\\stul.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|c:\\users\\jprochazka\\source\\repos\\agiloxsortinghall\\agiloxsortinghall\\pages\\skladnik.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|solutionrelative:agiloxsortinghall\\pages\\skladnik.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E57A5DE7-3AD5-428E-BA48-64FAB43FD16A}|AgiloxSortingHall\\AgiloxSortingHall.csproj|c:\\users\\jprochazka\\source\\repos\\agiloxsortinghall\\agiloxsortinghall\\pages\\skladnik.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -35,19 +43,45 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "_StulArticleList.cshtml",
+              "DocumentMoniker": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Pages\\Shared\\_StulArticleList.cshtml",
+              "RelativeDocumentMoniker": "AgiloxSortingHall\\Pages\\Shared\\_StulArticleList.cshtml",
+              "ToolTip": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Pages\\Shared\\_StulArticleList.cshtml",
+              "RelativeToolTip": "AgiloxSortingHall\\Pages\\Shared\\_StulArticleList.cshtml",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAACcAAABuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-28T12:09:06.752Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "AgiloxSortingHall\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\wwwroot\\css\\site.css*",
+              "RelativeToolTip": "AgiloxSortingHall\\wwwroot\\css\\site.css*",
+              "ViewState": "AgIAABkBAAAAAAAAAAAUwCMBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-11-28T12:01:20.325Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "20251128082416_AddHallSettings.cs",
               "DocumentMoniker": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs",
               "RelativeDocumentMoniker": "AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs",
               "ToolTip": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs",
               "RelativeToolTip": "AgiloxSortingHall\\Migrations\\20251128082416_AddHallSettings.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-28T08:24:16.664Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "Stul.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Pages\\Stul.cshtml.cs",
               "RelativeDocumentMoniker": "AgiloxSortingHall\\Pages\\Stul.cshtml.cs",
@@ -60,7 +94,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "Skladnik.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Pages\\Skladnik.cshtml.cs",
               "RelativeDocumentMoniker": "AgiloxSortingHall\\Pages\\Skladnik.cshtml.cs",
@@ -73,13 +107,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Skladnik.cshtml",
               "DocumentMoniker": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Pages\\Skladnik.cshtml",
               "RelativeDocumentMoniker": "AgiloxSortingHall\\Pages\\Skladnik.cshtml",
               "ToolTip": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\Pages\\Skladnik.cshtml",
               "RelativeToolTip": "AgiloxSortingHall\\Pages\\Skladnik.cshtml",
-              "ViewState": "AgIAAHgAAAAAAAAAAAAAAGEAAAA0AAAAAAAAAA==",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAswJkAAABUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-11-28T08:13:25.712Z",
               "EditorCaption": ""

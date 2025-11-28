@@ -16,7 +16,20 @@
 
     <div class="row">
         <div class="col-12">
-            <h1 class="my-3">Skladník</h1>
+            @* Hlavička s názvem a hamburgerem pro nastavení *@
+            <div class="d-flex justify-content-between align-items-center my-3">
+                <h1 class="mb-0">Skladník</h1>
+
+                @* Hambáč, který jen rozbaluje/sbalí panel s nastavením *@
+                <button class="btn btn-outline-secondary btn-sm"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#settingsPanel"
+                        aria-expanded="false"
+                        aria-controls="settingsPanel">
+                    ☰ Nastavení
+                </button>
+            </div>
         </div>
     </div>
 
@@ -30,66 +43,68 @@
         </div>
     }
 
-    @* Panel pro nastavení strategie výběru řady (globální pro celou halu) *@
+    @* Panel s nastavením schovaný v collapse *@
     <div class="row">
         <div class="col-12">
-            <div class="card my-2">
-                <div class="card-header">
-                    Nastavení výběru řady pro artikly (používají stoly)
-                </div>
-                <div class="card-body">
-                    <form method="post" asp-page-handler="SetRowSelectionStrategy" class="mb-0">
+            <div class="collapse" id="settingsPanel">
+                <div class="card my-2">
+                    <div class="card-header">
+                        Nastavení výběru řady pro artikly (používají stoly)
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="SetRowSelectionStrategy" class="mb-0">
 
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="strategy"
-                                   id="strategyMostFree"
-                                   value="MostFreePallets"
-                                   @(Model.CurrentStrategy == RowSelectionStrategy.MostFreePallets ? "checked" : "") />
-                            <label class="form-check-label" for="strategyMostFree">
-                                Nejvíc volných palet
-                                <small class="text-muted d-block">
-                                    Vybere řadu s daným artiklem, kde je nejvíc volných palet
-                                    (obsazené sloty mínus už odeslané call-y na Agiloxe).
-                                </small>
-                            </label>
-                        </div>
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="strategy"
+                                       id="strategyMostFree"
+                                       value="MostFreePallets"
+                                       @(Model.CurrentStrategy == RowSelectionStrategy.MostFreePallets ? "checked" : "") />
+                                <label class="form-check-label" for="strategyMostFree">
+                                    Nejvíc volných palet
+                                    <small class="text-muted d-block">
+                                        Vybere řadu s daným artiklem, kde je nejvíc volných palet
+                                        (obsazené sloty mínus už odeslané call-y na Agiloxe).
+                                    </small>
+                                </label>
+                            </div>
 
-                        <div class="form-check mt-2">
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="strategy"
-                                   id="strategyLeft"
-                                   value="NearestLeft"
-                                   @(Model.CurrentStrategy == RowSelectionStrategy.NearestLeft ? "checked" : "") />
-                            <label class="form-check-label" for="strategyLeft">
-                                Nejblíž vlevo
-                                <small class="text-muted d-block">
-                                    Vždy bere řadu nejvíc vlevo (podle pořadí řad v hale).
-                                </small>
-                            </label>
-                        </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="strategy"
+                                       id="strategyLeft"
+                                       value="NearestLeft"
+                                       @(Model.CurrentStrategy == RowSelectionStrategy.NearestLeft ? "checked" : "") />
+                                <label class="form-check-label" for="strategyLeft">
+                                    Nejblíž vlevo
+                                    <small class="text-muted d-block">
+                                        Vždy bere řadu nejvíc vlevo (podle pořadí řad v hale).
+                                    </small>
+                                </label>
+                            </div>
 
-                        <div class="form-check mt-2">
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="strategy"
-                                   id="strategyRight"
-                                   value="NearestRight"
-                                   @(Model.CurrentStrategy == RowSelectionStrategy.NearestRight ? "checked" : "") />
-                            <label class="form-check-label" for="strategyRight">
-                                Nejblíž vpravo
-                                <small class="text-muted d-block">
-                                    Vždy bere řadu nejvíc vpravo (podle pořadí řad v hale).
-                                </small>
-                            </label>
-                        </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="strategy"
+                                       id="strategyRight"
+                                       value="NearestRight"
+                                       @(Model.CurrentStrategy == RowSelectionStrategy.NearestRight ? "checked" : "") />
+                                <label class="form-check-label" for="strategyRight">
+                                    Nejblíž vpravo
+                                    <small class="text-muted d-block">
+                                        Vždy bere řadu nejvíc vpravo (podle pořadí řad v hale).
+                                    </small>
+                                </label>
+                            </div>
 
-                        <button type="submit" class="btn btn-primary btn-sm mt-3">
-                            Uložit nastavení
-                        </button>
-                    </form>
+                            <button type="submit" class="btn btn-primary btn-sm mt-3">
+                                Uložit nastavení
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,20 +112,11 @@
 
     @* Kontejner se všemi sloupci (řadami v hale) *@
     <div class="hall-columns-container">
-
         @foreach (var row in Model.Rows)
         {
             <div class="hall-column">
 
-                @* 
-                   Vykreslení vizuální reprezentace řady:
-                   - obsazené sloty
-                   - volné sloty
-                   - pending call-y
-                   - kapacita
-
-                   Tento partial používá jednotný vzhled i s view stolu.
-                *@
+                @* Vizuální reprezentace řady *@
                 @await Html.PartialAsync(
                 "_HallColumnVisual",
                         new HallColumnVisualModel
@@ -118,37 +124,34 @@
                             Row = row,
                             MaxCapacity = maxCapacity,
                             PendingCalls = Model.PendingCalls,
-                            CurrentTableId = null // skladník není vázán na konkrétní stůl
+                            CurrentTableId = null
                         })
 
             @* Formulář pro manipulaci s danou řadou *@
             <form method="post" class="w-100 mt-2">
                 <input type="hidden" name="rowId" value="@row.Id" />
 
-                @* Textové pole pro zadání/změnu názvu artiklu v řadě *@
-                <div class="input-group input-group-sm mb-1">
+                <div class="input-group mb-2">
                     <input type="text"
                            class="form-control"
                            placeholder="Název artiklu"
                            name="RowArticle[@row.Id]"
                            value="@(Model.RowArticle[row.Id])" />
 
-                    <button class="btn btn-outline-primary"
+                    <button class="btn btn-outline-primary btn-lg"
                             type="submit"
                             asp-page-handler="SetArticle">
                         💾
                     </button>
                 </div>
 
-                @* Přidání palety do nejbližšího volného slotu *@
-                <button class="btn btn-success btn-sm w-100"
+                <button class="btn btn-success btn-lg w-100 py-3 fw-bold"
                         type="submit"
                         asp-page-handler="AddPallet">
                     +1
                 </button>
 
-                @* Odebrání horní palety – chráněno JS confirm dialogem *@
-                <button class="btn btn-outline-danger btn-sm w-100 mt-1"
+                <button class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold mt-2"
                         type="submit"
                         asp-page-handler="RemovePallet"
                         onclick="return confirm('Opravdu odebrat jednu paletu z této řady?');">
