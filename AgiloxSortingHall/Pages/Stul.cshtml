@@ -18,27 +18,29 @@
         <div class="col-12 d-flex justify-content-between align-items-center my-3">
 
             <!-- Název stolu -->
-            <h1 class="mb-0">@Model.Table.Name</h1>
+            <h1 class="mb-0 text-light">@Model.Table.Name</h1>
 
             <div class="d-flex align-items-center gap-2">
-                <!-- Přepínač zobrazení -->
-                <div class="btn-group btn-group-sm me-2" role="group" aria-label="Přepínač zobrazení">
+                <!-- Přepínač zobrazení – větší kvůli tabletu -->
+                <div class="btn-group btn-group-lg me-2" role="group" aria-label="Přepínač zobrazení">
                     <a asp-page="./Stul"
                        asp-route-id="@Model.Table.Id"
                        asp-route-view="rows"
-                       class="btn @(Model.ViewMode == "rows" ? "btn-primary" : "btn-outline-primary")">
+                       class="btn @(Model.ViewMode == "rows" ? "btn-primary" : "btn-outline-primary") px-4">
                         Řady
                     </a>
                     <a asp-page="./Stul"
                        asp-route-id="@Model.Table.Id"
                        asp-route-view="articles"
-                       class="btn @(Model.ViewMode == "articles" ? "btn-primary" : "btn-outline-primary")">
+                       class="btn @(Model.ViewMode == "articles" ? "btn-primary" : "btn-outline-primary") px-4">
                         Artikly
                     </a>
                 </div>
 
-                <!-- Tlačítko zpět -->
-                <a asp-page="/Index" class="btn btn-outline-secondary btn-sm">Zpět</a>
+                <!-- Tlačítko zpět – také větší -->
+                <a asp-page="/Index" class="btn btn-outline-secondary btn-lg">
+                    Zpět
+                </a>
             </div>
         </div>
 
@@ -49,11 +51,11 @@
             var rowName = call.HallRow?.Name ?? "(neznámá řada)";
             var article = call.HallRow?.Article;
 
-            <div class="hall-wait d-flex flex-column justify-content-center align-items-center">
+            <div class="hall-wait d-flex flex-column justify-content-center align-items-center text-light">
                 <div class="text-center mb-4">
 
                     <!-- Nadpis sekce čekání -->
-                    <h2 class="mb-3">Čeká na doručení</h2>
+                    <h2 class="mb-3 fs-1">Čeká na doručení</h2>
 
                     <!-- Zobrazení základních informací o callu -->
                     <p class="fs-4 mb-1">
@@ -71,17 +73,18 @@
                     @* Rozlišení dvou stavů: čekáme buď na skladníka, nebo už jede Agilox *@
                     @if (string.IsNullOrEmpty(call.RequestId))
                     {
-                        <p class="fs-5 text-muted mt-3">
+                        <p class="fs-5 text-secondary mt-3">
                             Čeká se na doplnění palety skladníkem…
                         </p>
                     }
                     else
                     {
-                        <p class="fs-5 text-muted mt-3">
+                        <p class="fs-5 text-secondary mt-3">
                             Čeká se na doručení Agiloxem…
                         </p>
-                        <p class="fs-6 text-muted">
-                            Request ID: <code>@call.RequestId</code>
+                        <p class="fs-6 mt-2">
+                            Request ID:
+                            <code class="text-info">@call.RequestId</code>
                         </p>
                     }
                 </div>
@@ -91,7 +94,7 @@
                     <form method="post" asp-page-handler="CancelCall">
                         <button type="submit"
                                 class="btn btn-outline-danger btn-lg w-100 py-3">
-                            ❌ Zrušit požadavek
+                            ✖ Zrušit požadavek
                         </button>
                     </form>
                 </div>
@@ -135,3 +138,4 @@
         }
 
     </div>
+</div>

@@ -260,7 +260,7 @@ namespace AgiloxSortingHall.Pages
 
             if (frontSlot == null)
             {
-                ErrorMessage = $"Øada {row.Name} nemá žádnou paletu k odebrání.";
+                ErrorMessage = $"{row.Name} nemá žádnou paletu k odebrání.";
                 return RedirectToPage();
             }
 

@@ -4,10 +4,8 @@
 @model AgiloxSortingHall.Pages.SkladnikModel
 
 @{
-    // Titulek stránky pro layout a prohlížeč
     ViewData["Title"] = "Skladník";
 
-    // Zjištění největší kapacity řad – používá se pro CSS grid
     var maxCapacity = Model.Rows.Any() ? Model.Rows.Max(r => r.Capacity) : 0;
     var columnCount = Model.Rows.Count;
 }
@@ -16,28 +14,25 @@
 
     <div class="row">
         <div class="col-12">
-            @* Hlavička s názvem a tlačítkem pro nastavení *@
             <div class="d-flex justify-content-between align-items-center my-3">
-                <h1 class="mb-0 d-flex align-items-center">
+                <h1 class="mb-0 d-flex align-items-center text-light">
                     <i class="bi bi-person-gear me-2"></i>
                     Skladník
                 </h1>
 
-                @* Tlačítko, které rozbaluje/sbalí panel s nastavením *@
-                <button class="btn btn-outline-secondary btn-lg d-flex align-items-center px-3 py-2"
+                <button class="btn btn-dark btn-lg d-flex align-items-center px-3 py-2"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#settingsPanel"
                         aria-expanded="false"
                         aria-controls="settingsPanel">
-                    <i class="bi bi-gear-wide-connected me-2 fs-4"></i>
+                    <i class="bi bi-gear-fill me-2 fs-4"></i>
                     <span class="fs-5">Nastavení</span>
                 </button>
             </div>
         </div>
     </div>
 
-    @* Zobrazení chyby pokud nějaká vznikla (např. nevalidní operace apod.) *@
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <div class="row">
@@ -47,15 +42,15 @@
         </div>
     }
 
-    @* Panel s nastavením schovaný v collapse *@
     <div class="row">
         <div class="col-12">
             <div class="collapse" id="settingsPanel">
-                <div class="card my-2">
-                    <div class="card-header d-flex align-items-center">
+                <div class="card my-2 bg-dark text-light border-secondary">
+                    <div class="card-header bg-secondary bg-opacity-25 border-secondary d-flex align-items-center">
                         <i class="bi bi-sliders me-2"></i>
                         <span>Nastavení výběru řady pro artikly (používají stoly)</span>
                     </div>
+
                     <div class="card-body">
                         <form method="post" asp-page-handler="SetRowSelectionStrategy" class="mb-0">
 
@@ -69,8 +64,7 @@
                                 <label class="form-check-label" for="strategyMostFree">
                                     Nejvíc volných palet
                                     <small class="text-muted d-block">
-                                        Vybere řadu s daným artiklem, kde je nejvíc volných palet
-                                        (obsazené sloty mínus už odeslané call-y na Agiloxe).
+                                        Vybere řadu s daným artiklem, kde je nejvíc volných palet.
                                     </small>
                                 </label>
                             </div>
@@ -85,7 +79,7 @@
                                 <label class="form-check-label" for="strategyLeft">
                                     Nejblíž vlevo
                                     <small class="text-muted d-block">
-                                        Vždy bere řadu nejvíc vlevo (podle pořadí řad v hale).
+                                        Vždy bere řadu nejvíc vlevo.
                                     </small>
                                 </label>
                             </div>
@@ -100,7 +94,7 @@
                                 <label class="form-check-label" for="strategyRight">
                                     Nejblíž vpravo
                                     <small class="text-muted d-block">
-                                        Vždy bere řadu nejvíc vpravo (podle pořadí řad v hale).
+                                        Vždy bere řadu nejvíc vpravo.
                                     </small>
                                 </label>
                             </div>
@@ -115,13 +109,11 @@
         </div>
     </div>
 
-    @* Kontejner se všemi sloupci (řadami v hale) *@
     <div class="hall-columns-container">
         @foreach (var row in Model.Rows)
         {
             <div class="hall-column">
 
-                @* Vizuální reprezentace řady *@
                 @await Html.PartialAsync(
                 "_HallColumnVisual",
                         new HallColumnVisualModel
@@ -130,41 +122,39 @@
                             MaxCapacity = maxCapacity,
                             PendingCalls = Model.PendingCalls,
                             CurrentTableId = null
-                        })
+                        }
+                        )
 
-            @* Formulář pro manipulaci s danou řadou *@
             <form method="post" class="w-100 mt-2" id="row-form-@row.Id">
                 <input type="hidden" name="rowId" value="@row.Id" />
 
                 <div class="input-group mb-2">
                     <input type="text"
-                           class="form-control form-control-lg"
+                           class="form-control form-control-lg bg-dark text-light border-secondary"
                            placeholder="Název artiklu"
                            name="RowArticle[@row.Id]"
                            value="@(Model.RowArticle[row.Id])" />
 
-                    <button class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center"
+                    <button class="btn btn-dark btn-lg d-flex align-items-center justify-content-center border-secondary"
                             type="submit"
                             asp-page-handler="SetArticle">
-                        <i class="bi bi-pencil fs-4"></i>
+                        <i class="bi bi-pencil-fill fs-4 text-info"></i>
                     </button>
                 </div>
 
-                <button class="btn btn-success btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center"
+                <button class="btn btn-success btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center icon-white"
                         type="submit"
                         asp-page-handler="AddPallet">
                     <i class="bi bi-plus-lg me-2"></i>
-                    <span>+1</span>
                 </button>
 
-                @* Odebrání palety – otevře potvrzovací modal *@
-                <button class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold mt-2 d-flex align-items-center justify-content-center"
+                <!-- Odebrání palety – otevře potvrzovací modal a předá rowId -->
+                <button class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold mt-2 d-flex align-items-center justify-content-center border-danger icon-white"
                         type="button"
                         data-bs-toggle="modal"
                         data-bs-target="#confirmRemoveModal"
-                        data-form-id="row-form-@row.Id">
+                        data-row-id="@row.Id">
                     <i class="bi bi-dash-lg me-2"></i>
-                    <span>-1</span>
                 </button>
             </form>
         </div>
@@ -172,33 +162,33 @@
     </div>
 </div>
 
-@* Bootstrap modal pro potvrzení odebrání palety *@
+<!-- Modal pro potvrzení odebrání palety -->
 <div class="modal fade" id="confirmRemoveModal" tabindex="-1" aria-labelledby="confirmRemoveModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
                 <h5 class="modal-title d-flex align-items-center" id="confirmRemoveModalLabel">
                     <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
                     Odebrat paletu
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-2">
-                    Opravdu chceš odebrat jednu paletu z této řady?
-                </p>
+                <p class="mb-2">Opravdu chceš odebrat jednu paletu z této řady?</p>
                 <p class="text-muted small mb-0">
-                    Akce je určena pro opravu omylem přidané palety. Neovlivní běžící požadavky na Agiloxe,
-                    pouze změní počet fyzicky evidovaných palet v řadě.
+                    Určeno pouze pro opravu omylem přidané palety.
                 </p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Zrušit
-                </button>
-                <button type="button" class="btn btn-danger" id="confirmRemoveBtn">
-                    Odebrat paletu
-                </button>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+
+                @* VLASTNÍ FORM PRO REMOVE PALLET *@
+                <form method="post" asp-page-handler="RemovePallet" id="removePalletForm" class="m-0">
+                    <input type="hidden" name="rowId" id="removePalletRowId" value="" />
+                    <button type="submit" class="btn btn-danger" id="confirmRemoveBtn">
+                        Odebrat paletu
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -208,22 +198,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var confirmModal = document.getElementById('confirmRemoveModal');
-            var formIdToSubmit = null;
+            var rowIdInput = document.getElementById('removePalletRowId');
 
-            // Když se modal otevírá, vezmeme z tlačítka id formuláře
+            // Když se modal otevírá, vezmeme z tlačítka rowId a vložíme do hidden inputu
             confirmModal.addEventListener('show.bs.modal', function (event) {
                 var button = event.relatedTarget;
-                formIdToSubmit = button ? button.getAttribute('data-form-id') : null;
-            });
+                var rowId = button ? button.getAttribute('data-row-id') : null;
 
-            // Po potvrzení v modalu odešleme daný formulář
-            var confirmButton = document.getElementById('confirmRemoveBtn');
-            confirmButton.addEventListener('click', function () {
-                if (formIdToSubmit) {
-                    var form = document.getElementById(formIdToSubmit);
-                    if (form) {
-                        form.submit();
-                    }
+                if (rowIdInput && rowId) {
+                    rowIdInput.value = rowId;
                 }
             });
         });

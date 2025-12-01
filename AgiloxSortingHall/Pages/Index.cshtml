@@ -4,20 +4,20 @@
     ViewData["Title"] = "Výběr stolu";
 }
 
-<div class="container py-4">
+<div class="container py-4 text-light">
 
     <!-- Hlavička stránky -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="fw-bold m-0">Agilox Sorting Hall</h1>
-            <div class="text-muted fs-6">Vyber stůl pro obsluhu</div>
+            <h1 class="fw-bold m-0">Agilox na hale třídění</h1>
+            <div class="text-secondary fs-6">Vyber stůl pro obsluhu</div>
         </div>
 
         <!-- Odkaz na skladníka -->
         <a asp-page="/Skladnik"
-           class="btn btn-outline-primary btn-lg d-flex align-items-center">
+           class="btn btn-outline-info btn-lg d-flex align-items-center px-4 py-2">
             <i class="bi bi-box-seam me-2 fs-3"></i>
-            <span>Obrazovka skladníka</span>
+            <span class="fs-5">Obrazovka skladníka</span>
         </a>
     </div>
 
@@ -43,7 +43,8 @@
                 <div class="col-12 col-md-6 col-lg-4 d-flex">
                     <a asp-page="/Stul"
                        asp-route-id="@table.Id"
-                       class="btn btn-light border rounded flex-fill p-4 text-start d-flex flex-column justify-content-between">
+                       class="btn bg-dark text-light border border-secondary rounded-3
+                                      flex-fill p-4 text-start d-flex flex-column justify-content-between shadow-sm">
 
                         <!-- Horní část: ikona stavu + název stolu -->
                         <div class="d-flex align-items-center mb-2">
@@ -64,13 +65,19 @@
                         <div class="mt-2">
                             @if (!hasPending)
                             {
-                                <div class="text-success fw-semibold fs-5 mb-1">Připraveno</div>
-                                <div class="text-muted">Žádný čekající požadavek.</div>
+                                <div class="text-success fw-semibold fs-5 mb-1">
+                                    Připraveno
+                                </div>
+                                <div class="text-secondary">
+                                    Žádný čekající požadavek.
+                                </div>
                             }
                             else
                             {
-                                <div class="text-warning fw-semibold fs-5 mb-1">Čeká na paletu</div>
-                                <div class="text-muted">
+                                <div class="text-warning fw-semibold fs-5 mb-1">
+                                    Čeká na paletu
+                                </div>
+                                <div class="text-secondary">
                                     Řada: <strong>@rowName</strong>
                                     @if (!string.IsNullOrWhiteSpace(article))
                                     {
@@ -79,7 +86,6 @@
                                 </div>
                             }
                         </div>
-
 
                     </a>
                 </div>

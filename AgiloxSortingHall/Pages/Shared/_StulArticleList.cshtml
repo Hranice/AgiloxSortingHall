@@ -9,15 +9,12 @@
         .GroupBy(r => r.Article)
         .OrderBy(g => g.Key)
         .ToList();
-
-    // Pro případ, že by některé řady měly prázdný artikl, dá se vždy
-    // zvlášť zobrazit i ta skupina (teď ji ignorujeme).
 }
 
 <div class="container-fluid px-3 py-2">
     @if (!articleGroups.Any())
     {
-        <p class="text-muted">
+        <p class="text-light">
             Žádné artikly nejsou k dispozici.
         </p>
     }
@@ -40,14 +37,18 @@
                         <input type="hidden" name="article" value="@group.Key" />
 
                         <button type="submit"
-                                class="btn btn-light border flex-fill p-4 text-start fs-3">
-                            <div class="d-flex flex-column">
-                                <span class="fw-semibold mb-2">
-                                    @group.Key
-                                </span>
-                                <span class="text-muted fs-5">
-                                    Palet fyzicky přítomno: <strong>@palletCount</strong>
-                                </span>
+                                class="btn flex-fill text-start p-4
+                                               bg-dark text-light border border-secondary rounded-3
+                                               d-flex flex-column justify-content-center shadow-sm">
+
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-box-seam fs-2 me-3 text-info"></i>
+                                <span class="fs-3 fw-semibold">@group.Key</span>
+                            </div>
+
+                            <div class="mt-2 fs-5">
+                                <span class="text-light">Palet fyzicky přítomno:</span>
+                                <strong class="ms-1">@palletCount</strong>
                             </div>
                         </button>
                     </form>
