@@ -21,7 +21,8 @@
             <h1 class="mb-0 text-light">@Model.Table.Name</h1>
 
             <div class="d-flex align-items-center gap-2">
-                <!-- Přepínač zobrazení – větší kvůli tabletu -->
+                <!-- /// Původní přepínač zobrazení, vypnuto kvůli omezenému počtu tabletů -->
+               @*  <!-- Přepínač zobrazení – větší kvůli tabletu -->
                 <div class="btn-group btn-group-lg me-2" role="group" aria-label="Přepínač zobrazení">
                     <a asp-page="./Stul"
                        asp-route-id="@Model.Table.Id"
@@ -36,7 +37,7 @@
                         Artikly
                     </a>
                 </div>
-
+ *@
                 <!-- Tlačítko zpět – také větší -->
                 <a asp-page="/Index" class="btn btn-outline-secondary btn-lg">
                     Zpět
@@ -71,7 +72,7 @@
                     }
 
                     @* Rozlišení dvou stavů: čekáme buď na skladníka, nebo už jede Agilox *@
-                    @if (string.IsNullOrEmpty(call.RequestId))
+                    @if (call.OrderId != null)
                     {
                         <p class="fs-5 text-secondary mt-3">
                             Čeká se na doplnění palety skladníkem…
@@ -84,7 +85,7 @@
                         </p>
                         <p class="fs-6 mt-2">
                             Request ID:
-                            <code class="text-info">@call.RequestId</code>
+                            <code class="text-info">@call.OrderId</code>
                         </p>
                     }
                 </div>

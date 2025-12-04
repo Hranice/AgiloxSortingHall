@@ -64,11 +64,11 @@
         public RowCallStatus Status { get; set; } = RowCallStatus.Pending;
 
         /// <summary>
-        /// Identifikátor workflow odeslaného na Agilox,
+        /// Identifikátor order vráceného od Agiloxe,
         /// sloužící ke spárování s callbackem
-        /// (generován lokálně při odeslání požadavku).
+        /// (generován Agiloxem po odeslání požadavku).
         /// </summary>
-        public string? RequestId { get; set; } = null!;
+        public long? OrderId { get; set; } = null!;
     }
 
 }

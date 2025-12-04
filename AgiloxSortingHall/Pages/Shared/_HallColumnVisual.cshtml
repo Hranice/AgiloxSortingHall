@@ -14,7 +14,7 @@
 
     // z pending callů vyfiltrujeme ty, které už mají spuštěný workflow na Agiloxu
     var dispatchedCalls = rowQueue
-        .Where(c => !string.IsNullOrEmpty(c.RequestId))
+        .Where(c => c.OrderId != null)
         .OrderBy(c => c.RequestedAt)
         .ToList();
 

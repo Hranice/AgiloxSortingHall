@@ -29,26 +29,33 @@ namespace AgiloxSortingHall.Services
 
         /// <summary>
         /// Zpracuje callback od Agiloxu:
-        /// najde odpovídající RowCall podle RequestId,
+        /// najde odpovídající RowCall podle OrderId,
         /// označí jej jako doručený a uvolní spodní obsazený slot v řadě.
         /// </summary>
-        /// <param name="dto">Data z callbacku obsahující RequestId.</param>
+        /// <param name="dto">Data z callbacku obsahující OrderId.</param>
         public async Task ProcessCallbackAsync(AgiloxCallbackDto dto)
         {
+            _logger.LogInformation(
+                "Processing Agilox callback: row={Row}, table={Table}",
+                dto.row, dto.table);
+
+            // najdeme pending RowCall pro daný stůl a řadu
             var call = await _db.RowCalls
                 .Include(c => c.HallRow)
                     .ThenInclude(r => r.Slots)
                 .Include(c => c.WorkTable)
                 .Where(c =>
                     c.Status == RowCallStatus.Pending &&
-                    c.RequestId == dto.requestId)
+                    c.WorkTable.Name == dto.table &&
+                    c.HallRow.Name == dto.row)
+                .OrderByDescending(c => c.RequestedAt) // pro jistotu, kdyby jich tam někdy bylo víc
                 .FirstOrDefaultAsync();
-
-            _logger.LogInformation("Processing Agilox callback for RequestId: {RequestId}", dto.requestId);
 
             if (call == null)
             {
-                _logger.LogWarning("No pending RowCall found for RequestId: {RequestId}", dto.requestId);
+                _logger.LogWarning(
+                    "No pending RowCall found for callback row={Row}, table={Table}.",
+                    dto.row, dto.table);
                 return;
             }
 
@@ -59,15 +66,25 @@ namespace AgiloxSortingHall.Services
                 .FirstOrDefault();
 
             if (bottomSlot != null)
+            {
                 bottomSlot.State = PalletState.Empty;
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "No occupied slot found in row {Row} for RowCall {RowCallId} when processing callback.",
+                    call.HallRow.Name, call.Id);
+            }
 
             call.Status = RowCallStatus.Delivered;
 
-            _logger.LogInformation("RowCall {RowCallId} marked as Delivered. Freed slot {SlotId}.",
+            _logger.LogInformation(
+                "RowCall {RowCallId} marked as Delivered. Freed slot {SlotId}.",
                 call.Id, bottomSlot?.Id);
 
             await _db.SaveChangesAsync();
             await _hub.Clients.All.SendAsync("HallUpdated");
         }
+
     }
 }
