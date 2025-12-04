@@ -265,8 +265,8 @@ namespace AgiloxSortingHall.Pages
 
             var payload = new Dictionary<string, string>
             {
-                ["@ZAKLIKNUTARADA"] = row.Name,             // např. "Řada3"
-                ["@PRIJEMCE"] = callToDispatch.WorkTable.Name,  // např. "Stůl 1"
+                ["@ZAKLIKNUTARADA"] = row.Name,                   // např. "Řada3"
+                ["@PRIJEMCE"] = callToDispatch.WorkTable.Name,    // např. "Stůl 1"
                 ["@REQUESTID"] = requestId
             };
 
@@ -274,6 +274,10 @@ namespace AgiloxSortingHall.Pages
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync("workflow/502", content);
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("Agilox odpověď pro řadu {Row}: {Body}", row.Name, responseBody);
+
             response.EnsureSuccessStatusCode();
 
             // uložíme si requestId do callu – to se nám vrátí v callbacku
@@ -283,6 +287,7 @@ namespace AgiloxSortingHall.Pages
             _logger.LogInformation("Odeslán workflow 502 pro řadu {Row} a stůl {Table}, requestId={Req}",
                 row.Name, callToDispatch.WorkTable.Name, requestId);
         }
+
 
 
         /// <summary>

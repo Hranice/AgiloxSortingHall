@@ -1,0 +1,4 @@
+2025-12-04 12:51:34.144 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-04 12:51:51.159 +01:00 [INF] Agilox odpověď pro řadu Řada3: {"status":"success","id":169956752581240004}
+2025-12-04 12:51:51.172 +01:00 [INF] Odeslán workflow 502 pro řadu Řada3 a stůl Stůl 1, requestId=248c27455bc34cf78d13ef5b9a9040da
+2025-12-04 12:52:00.982 +01:00 [INF] Agilox order 169956752581240004 (requestId=248c27455bc34cf78d13ef5b9a9040da) byl zrušen.

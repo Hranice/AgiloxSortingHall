@@ -13,13 +13,15 @@ namespace AgiloxSortingHall.Controllers
     public class AgiloxCallbackController : ControllerBase
     {
         private readonly AgiloxService _service;
+        private readonly ILogger<AgiloxCallbackController> _logger;
 
         /// <summary>
         /// Inicializuje instanci controlleru s referencí na AgiloxService.
         /// </summary>
-        public AgiloxCallbackController(AgiloxService service)
+        public AgiloxCallbackController(AgiloxService service, ILogger<AgiloxCallbackController> logger)
         {
             _service = service;
+            _logger = logger;
         }
 
         /// <summary>
@@ -30,6 +32,8 @@ namespace AgiloxSortingHall.Controllers
         [HttpPost("callback")]
         public async Task<IActionResult> Callback([FromBody] AgiloxCallbackDto dto)
         {
+            _logger.LogWarning("Agilox callback HIT. DTO = {@dto}", dto);
+
             await _service.ProcessCallbackAsync(dto);
             return Ok();
         }

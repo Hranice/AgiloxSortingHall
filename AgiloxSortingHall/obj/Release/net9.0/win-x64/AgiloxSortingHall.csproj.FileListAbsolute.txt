@@ -521,4 +521,13 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\mscorrc.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\msquic.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\aspnetcorev2_inprocess.dll
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\exdf17do33-{0}-zae23whek5-zae23whek5.gz
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\exdf17do33-{0}-f9wk2cqxra-f9wk2cqxra.gz
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.AspNetCore.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Extensions.Hosting.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Extensions.Logging.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Formatting.Compact.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Settings.Configuration.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Sinks.Console.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Sinks.Debug.dll
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Sinks.File.dll
