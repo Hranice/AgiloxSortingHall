@@ -180,7 +180,6 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\n
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\exdf17do33-{0}-f9wk2cqxra-f9wk2cqxra.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\3a2fg0yb9w-{0}-61n19gt1b8-61n19gt1b8.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\v141eiou22-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\7hshqq6s1a-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -246,3 +245,4 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\n
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\461pu80yc6-{0}-cr37bionm2-cr37bionm2.gz
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\swae.build.ex.cache
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Debug\net9.0\compressed\exdf17do33-{0}-qweb7k1zr7-qweb7k1zr7.gz

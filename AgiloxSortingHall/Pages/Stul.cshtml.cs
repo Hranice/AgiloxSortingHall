@@ -64,13 +64,13 @@ namespace AgiloxSortingHall.Pages
             Table = await _db.WorkTables.FindAsync(id)
                 ?? throw new Exception("Stůl nenalezen");
 
-            if (string.Equals(view, "articles", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(view, "rows", StringComparison.OrdinalIgnoreCase))
             {
-                ViewMode = "articles";
+                ViewMode = "rows";
             }
             else
             {
-                ViewMode = "rows";
+                ViewMode = "articles";
             }
 
             Rows = await _db.HallRows
@@ -301,7 +301,6 @@ namespace AgiloxSortingHall.Pages
 
             if (agiloxId.HasValue)
             {
-                // uložíme si OrderId = ID z Agiloxu – to se nám vrátí v callbacku
                 callToDispatch.OrderId = agiloxId.Value;
             }
             else
@@ -426,5 +425,30 @@ namespace AgiloxSortingHall.Pages
             return result;
         }
 
+        public string GetActivityDescription(RowCall call)
+        {
+            // Ještě nemáme OrderId -> požadavek je jen v systému, Agilox o něm neví.
+            if (call.OrderId == null)
+                return "čeká na doplnění palety skladníkem";
+
+            // Máme OrderId -> koukneme na poslední event z Agiloxu
+            return call.LastAgiloxEvent switch
+            {
+                "order_created" => "objednávka vytvořena v Agiloxu",
+                "order_started" => "Agilox zahájil zpracování požadavku",
+                "station_entered" => "najíždí do stanice s paletou",
+                "station_left" => "opustil stanici s paletou",
+                "target_pre_pos_reached"
+                  or "target_prepre_pos_reached"
+                  or "target_reached" => "jede ke stolu s paletou",
+                "order_done" => "paleta byla doručena ke stolu",
+                "order_canceled" => "požadavek byl zrušen",
+                "no_route" => "nelze najít trasu k cíli",
+                "no_station_left" => "není dostupná vhodná stanice pro akci",
+                "timeout"
+                  or "obstruction_timeout" => "čeká kvůli překážce nebo timeoutu",
+                _ => "Agilox zpracovává požadavek"
+            };
+        }
     }
 }

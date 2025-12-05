@@ -6,7 +6,7 @@ namespace AgiloxSortingHall.ViewModels
     /// ViewModel pro vizualizaci jednoho sloupce (řady) v hale.
     /// Používají ho jak stránka skladníka, tak stránka stolu.
     /// </summary>
-    public class HallColumnVisualModel
+    public class HallColumnViewModel
     {
         /// <summary>
         /// Řada, kterou vykreslujeme (např. Řada1).

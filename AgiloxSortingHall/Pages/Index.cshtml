@@ -1,4 +1,5 @@
 ﻿@page
+@using AgiloxSortingHall.Models
 @model AgiloxSortingHall.Pages.IndexModel
 @{
     ViewData["Title"] = "Výběr stolu";
@@ -39,12 +40,13 @@
                 var hasPending = call != null;
                 var rowName = call?.HallRow?.Name ?? "neznámá řada";
                 var article = call?.HallRow?.Article;
+                var activity = call != null ? Model.GetActivityDescription(call) : null;
 
                 <div class="col-12 col-md-6 col-lg-4 d-flex">
                     <a asp-page="/Stul"
                        asp-route-id="@table.Id"
                        class="btn bg-dark text-light border border-secondary rounded-3
-                                      flex-fill p-4 text-start d-flex flex-column justify-content-between shadow-sm">
+                                              flex-fill p-4 text-start d-flex flex-column justify-content-between shadow-sm">
 
                         <!-- Horní část: ikona stavu + název stolu -->
                         <div class="d-flex align-items-center mb-2">
@@ -75,14 +77,10 @@
                             else
                             {
                                 <div class="text-warning fw-semibold fs-5 mb-1">
-                                    Čeká na paletu
+                                    Probíhá požadavek
                                 </div>
-                                <div class="text-secondary">
-                                    Řada: <strong>@rowName</strong>
-                                    @if (!string.IsNullOrWhiteSpace(article))
-                                    {
-                                        <span> · Artikl <strong>@article</strong></span>
-                                    }
+                                <div class="text-light small opacity-75">
+                                    @activity (@article - @rowName)
                                 </div>
                             }
                         </div>

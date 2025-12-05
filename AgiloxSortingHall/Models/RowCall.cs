@@ -1,28 +1,6 @@
 ﻿namespace AgiloxSortingHall.Models
 {
     /// <summary>
-    /// Stav požadavku na paletu – čeká, doručeno, zrušeno.
-    /// </summary>
-    public enum RowCallStatus
-    {
-        /// <summary>
-        /// Požadavek čeká na vyřízení (nebo na doručení).
-        /// </summary>
-        Pending = 0,
-
-        /// <summary>
-        /// Požadavek byl úspěšně doručen.
-        /// </summary>
-        Delivered = 1,
-
-        /// <summary>
-        /// Požadavek byl zrušen uživatelem nebo systémem.
-        /// Funfact: Angláni prý používají cancelled namísto canceled.
-        /// </summary>
-        Cancelled = 2
-    }
-
-    /// <summary>
     /// Reprezentuje požadavek pracovního stolu na paletu z konkrétní řady.
     /// Sleduje stav, čas požadavku a identifikátor requestu odeslaného na Agilox.
     /// </summary>
@@ -69,6 +47,10 @@
         /// (generován Agiloxem po odeslání požadavku).
         /// </summary>
         public long? OrderId { get; set; } = null!;
+
+        public AgiloxOrderStatus? OrderStatus { get; set; }
+
+        public string? LastAgiloxEvent { get; set; }
     }
 
 }

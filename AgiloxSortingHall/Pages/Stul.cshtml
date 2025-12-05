@@ -12,38 +12,22 @@
     var columnCount = Model.Rows.Count;
 }
 
-<div class="container-fluid hall-page" style="--slot-count:@maxCapacity; --column-count:@columnCount;">
+<div class="container py-4 hall-page text-light" style="--slot-count:@maxCapacity; --column-count:@columnCount;">
 
-    <div class="row">
-        <div class="col-12 d-flex justify-content-between align-items-center my-3">
-
-            <!-- Název stolu -->
-            <h1 class="mb-0 text-light">@Model.Table.Name</h1>
-
-            <div class="d-flex align-items-center gap-2">
-                <!-- /// Původní přepínač zobrazení, vypnuto kvůli omezenému počtu tabletů -->
-               @*  <!-- Přepínač zobrazení – větší kvůli tabletu -->
-                <div class="btn-group btn-group-lg me-2" role="group" aria-label="Přepínač zobrazení">
-                    <a asp-page="./Stul"
-                       asp-route-id="@Model.Table.Id"
-                       asp-route-view="rows"
-                       class="btn @(Model.ViewMode == "rows" ? "btn-primary" : "btn-outline-primary") px-4">
-                        Řady
-                    </a>
-                    <a asp-page="./Stul"
-                       asp-route-id="@Model.Table.Id"
-                       asp-route-view="articles"
-                       class="btn @(Model.ViewMode == "articles" ? "btn-primary" : "btn-outline-primary") px-4">
-                        Artikly
-                    </a>
-                </div>
- *@
-                <!-- Tlačítko zpět – také větší -->
-                <a asp-page="/Index" class="btn btn-outline-secondary btn-lg">
-                    Zpět
-                </a>
-            </div>
+    <!-- Hlavička stránky -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold m-0">@Model.Table.Name</h1>
+            <div class="text-secondary fs-6">Vyber artikl k doručení</div>
         </div>
+
+        <!-- Tlačítko zpět -->
+        <a asp-page="/Index" class="btn btn-outline-secondary btn-lg">
+            Zpět
+        </a>
+    </div>
+
+       
 
         @* Pokud má stůl aktivní pending call, zobrazíme čekací obrazovku *@
         @if (Model.PendingCall != null)
@@ -51,6 +35,7 @@
             var call = Model.PendingCall;
             var rowName = call.HallRow?.Name ?? "(neznámá řada)";
             var article = call.HallRow?.Article;
+            var activity = call != null ? Model.GetActivityDescription(call) : null;
 
             <div class="hall-wait d-flex flex-column justify-content-center align-items-center text-light">
                 <div class="text-center mb-4">
@@ -72,7 +57,7 @@
                     }
 
                     @* Rozlišení dvou stavů: čekáme buď na skladníka, nebo už jede Agilox *@
-                    @if (call.OrderId != null)
+                    @if (call.OrderId == null)
                     {
                         <p class="fs-5 text-secondary mt-3">
                             Čeká se na doplnění palety skladníkem…
@@ -81,10 +66,10 @@
                     else
                     {
                         <p class="fs-5 text-secondary mt-3">
-                            Čeká se na doručení Agiloxem…
+                            @activity
                         </p>
                         <p class="fs-6 mt-2">
-                            Request ID:
+                            Agilox order ID:
                             <code class="text-info">@call.OrderId</code>
                         </p>
                     }
@@ -101,6 +86,7 @@
                 </div>
             </div>
         }
+
         else
         {
             @* Pokud žádný pending call neexistuje, zobrazí se obsah podle zvoleného režimu *@
@@ -112,7 +98,7 @@
                     {
                         <form method="post"
                               asp-page-handler="CallRow"
-                              class="hall-column">
+                          class="hall-column">
 
                             <input type="hidden" name="id" value="@Model.Table.Id" />
                             <input type="hidden" name="rowId" value="@row.Id" />
@@ -120,7 +106,7 @@
                             <button type="submit" class="btn btn-outline-primary column-button w-100 p-2">
                                 @await Html.PartialAsync(
                                 "_HallColumnVisual",
-                                        new HallColumnVisualModel
+                                        new HallColumnViewModel
                                         {
                                             Row = row,
                                             MaxCapacity = maxCapacity,
@@ -138,5 +124,17 @@
             }
         }
 
+
+    <div id="loading-overlay" class="loading-overlay d-none">
+        <div class="loading-inner text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Probíhá komunikace s Agiloxem…</span>
+            </div>
+            <div class="mt-3 fs-3">
+                Odesílám požadavek na Agilox…
+            </div>
+        </div>
     </div>
-</div>
+
+
+    </div>

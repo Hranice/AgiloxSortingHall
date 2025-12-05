@@ -1,4 +1,3 @@
-wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
@@ -61,8 +60,7 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\lib\jquery\LICENSE.txt
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\css\site.css
+wwwroot\css\site.css
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\favicon.ico
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\js\site.js
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
@@ -123,3 +121,5 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\lib
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\lib\jquery\dist\jquery.slim.js
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\lib\jquery\dist\jquery.slim.min.map
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\lib\jquery\LICENSE.txt
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\wwwroot\css\site.css

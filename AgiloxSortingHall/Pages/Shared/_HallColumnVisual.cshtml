@@ -1,6 +1,6 @@
 ﻿@using AgiloxSortingHall.Models
 @using AgiloxSortingHall.ViewModels
-@model HallColumnVisualModel
+@model HallColumnViewModel
 
 @{
     var row = Model.Row;
@@ -52,11 +52,25 @@
 
     // zbytek fronty = pending cally, které zatím nemají přidělenou paletu
     var remainingQueue = rowQueue.Skip(mapCount).ToList();
+
+    // text pro tooltip – seznam stolů, které ještě čekají
+    string? remainingQueueTooltip = remainingQueue.Any()
+        ? string.Join(", ",
+            remainingQueue.Select(c => c.WorkTable?.Name ?? $"Stůl {c.WorkTableId}"))
+        : null;
 }
 
 <!-- Název řady -->
 <div class="header-cell text-center fw-bold mb-2">
     @row.Name
+    @if (remainingQueue.Any())
+    {
+        <span class="badge bg-warning text-dark"
+              data-bs-toggle="tooltip"
+              title="@remainingQueueTooltip">
+            @remainingQueue.Count
+        </span>
+    }
 </div>
 
 <!-- Sloty -->
@@ -95,16 +109,6 @@
 }
 
 <!-- Název artiklu řady -->
-<div class="article-label small text-muted text-center mt-1">
+<div class="article-label small text-light text-center mt-1">
     @row.Article
 </div>
-
-<!-- Zbytek fronty (ti, co čekají na paletu) -->
-@if (remainingQueue.Any())
-{
-    <div class="queue-label small text-muted text-center mt-1">
-        fronta (čekají na paletu):
-        @string.Join(", ",
-        remainingQueue.Select(c => c.WorkTable?.Name ?? $"Stůl {c.WorkTableId}"))
-</div>
-}

@@ -51,7 +51,7 @@ body {
 
 /* Kořenový kontejner stránky vizualizace */
 .hall-page {
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     display: flex;
     flex-direction: column;
     background: var(--hall-bg);
@@ -323,11 +323,6 @@ body {
         color: #e9e8e6; /* teplá bílá */
     }
 
-
-    /* Všechny ikonky v dark režimu */
-    :root.dark-mode i.bi {
-        color: var(--accent-primary) !important;
-    }
 
 /* Jen v dark režimu – pokud máš na <html> class="dark-mode" */
 html.dark-mode .btn-outline-info {
