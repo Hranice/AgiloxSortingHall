@@ -1,4 +1,5 @@
 using AgiloxSortingHall.Data;
+using AgiloxSortingHall.Enums;
 using AgiloxSortingHall.Hubs;
 using AgiloxSortingHall.Models;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-﻿namespace AgiloxSortingHall.Models
+﻿namespace AgiloxSortingHall.Enums
 {
     /// <summary>
     /// Způsob, jakým se vybírá konkrétní řada pro daný artikl.

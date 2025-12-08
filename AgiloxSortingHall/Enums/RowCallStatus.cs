@@ -1,4 +1,4 @@
-﻿namespace AgiloxSortingHall.Models
+﻿namespace AgiloxSortingHall.Enums
 {
     /// <summary>
     /// Stav požadavku na paletu – čeká, doručeno, zrušeno.

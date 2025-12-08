@@ -1,26 +1,7 @@
-﻿namespace AgiloxSortingHall.Models
+﻿using AgiloxSortingHall.Enums;
+
+namespace AgiloxSortingHall.Models
 {
-    /// <summary>
-    /// Stav jedné pozice v řadě.
-    /// </summary>
-    public enum PalletState
-    {
-        /// <summary>
-        /// Pozice je prázdná.
-        /// </summary>
-        Empty = 0,
-
-        /// <summary>
-        /// Pozice obsahuje paletu.
-        /// </summary>
-        Occupied = 1,
-
-        /// <summary>
-        /// Paleta z této pozice je právě v převozu.
-        /// </summary>
-        InTransit = 2
-    }
-
     /// <summary>
     /// Jedna pozice ve sloupci řady.
     /// Obsahuje index pozice a informaci o aktuálním stavu.

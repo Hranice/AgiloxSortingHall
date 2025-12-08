@@ -32,7 +32,7 @@ namespace AgiloxSortingHall.Controllers
         [HttpPost("callback")]
         public async Task<IActionResult> Callback([FromBody] AgiloxCallbackDto dto)
         {
-            _logger.LogWarning("Agilox callback HIT. DTO = {@dto}", dto);
+            _logger.LogInformation("Agilox callback HIT. DTO = {@dto}", dto);
 
             await _service.ProcessCallbackAsync(dto);
             return Ok();

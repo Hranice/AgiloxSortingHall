@@ -1,4 +1,6 @@
-﻿namespace AgiloxSortingHall.Models
+﻿using AgiloxSortingHall.Enums;
+
+namespace AgiloxSortingHall.Models
 {
     /// <summary>
     /// Globální nastavení haly.

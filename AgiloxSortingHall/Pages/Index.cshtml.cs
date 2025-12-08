@@ -1,4 +1,6 @@
 using AgiloxSortingHall.Data;
+using AgiloxSortingHall.Enums;
+using AgiloxSortingHall.Helpers;
 using AgiloxSortingHall.Models;
 using AgiloxSortingHall.ViewModels;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -54,30 +56,12 @@ namespace AgiloxSortingHall.Pages
                 .ToList();
         }
 
+        /// <summary>
+        /// Vrátí textový popis aktuální aktivity pro daný RowCall,
+        /// založený na OrderId, posledním Agilox statusu a akci.
+        /// </summary>
         public string GetActivityDescription(RowCall call)
-        {
-            // Ještì nemáme OrderId -> požadavek existuje jen u tebe, ne u Agiloxe
-            if (call.OrderId == null)
-                return "èeká na doplnìní palety skladníkem";
-
-            // Máme OrderId -> koukneme na poslední event z Agiloxu
-            return call.LastAgiloxEvent switch
-            {
-                "order_created" => "objednávka vytvoøena v Agiloxu",
-                "order_started" => "Agilox zahájil zpracování požadavku",
-                "station_entered" => "najíždí do stanice s paletou",
-                "station_left" => "opustil stanici s paletou",
-                "target_pre_pos_reached"
-                  or "target_prepre_pos_reached"
-                  or "target_reached" => "jede ke stolu s paletou",
-                "order_done" => "paleta doruèena ke stolu",
-                "order_canceled" => "požadavek byl zrušen",
-                "no_route" => "nelze najít trasu k cíli",
-                "no_station_left" => "není dostupná vhodná stanice pro akci",
-                "timeout"
-                  or "obstruction_timeout" => "èeká kvùli pøekážce nebo timeoutu",
-                _ => "Agilox zpracovává požadavek"
-            };
-        }
+      => AgiloxActivityDescriptionHelper.GetActivityDescription(call);
+       
     }
 }

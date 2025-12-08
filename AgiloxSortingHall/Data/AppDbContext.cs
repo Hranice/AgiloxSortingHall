@@ -1,4 +1,5 @@
-﻿using AgiloxSortingHall.Models;
+﻿using AgiloxSortingHall.Enums;
+using AgiloxSortingHall.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AgiloxSortingHall.Data

@@ -10,20 +10,6 @@ namespace AgiloxSortingHall.Models
     public class AgiloxCallbackDto
     {
         /// <summary>
-        /// Název řady, ke které se callback vztahuje.
-        /// Odpovídá hodnotě proměnné <c>@ZAKLIKNUTARADA</c> odeslané ve workflow.
-        /// </summary>
-        [JsonPropertyName("row")]
-        public string Row { get; set; } = "";
-
-        /// <summary>
-        /// Název pracovního stolu, pro který byla paleta doručována.
-        /// Odpovídá hodnotě proměnné <c>@PRIJEMCE</c> použití ve workflow.
-        /// </summary>
-        [JsonPropertyName("table")]
-        public string Table { get; set; } = "";
-
-        /// <summary>
         /// Identifikátor objednávky (workflow ID) vygenerovaný Agiloxem.
         /// Slouží k jednoznačné identifikaci RowCall zadaného na backendu.
         /// </summary>
@@ -31,11 +17,31 @@ namespace AgiloxSortingHall.Models
         public long OrderId { get; set; }
 
         /// <summary>
-        /// Typ události zaslané Agiloxem (např. <c>order_started</c>, 
-        /// <c>station_left</c>, <c>order_done</c>, apod.).
+        /// Kategorie události popisující fázi workflow (např. <c>drop</c>, <c>picup</c>).
+        /// </summary>
+        [JsonPropertyName("action")]
+        public string? Action { get; set; }
+
+        /// <summary>
+        /// Reference na zakliknutou řadu, ze které se aktuálně doručuje paleta.
+        /// (např. <c>Řada 1</c>, <c>Řada 2</c>, apod.).
+        /// </summary>
+        [JsonPropertyName("row")]
+        public string? Row { get; set; }
+
+        /// <summary>
+        /// Reference na zakliknutou stůl, pro který se aktuálně doručuje paleta.
+        /// (např. <c>Stůl 1</c>, <c>Stůl 2</c>, apod.).
+        /// </summary>
+        [JsonPropertyName("table")]
+        public string? Table { get; set; }
+
+        /// <summary>
+        /// Aktuální status zaslaný Agiloxem (např. <c>ok</c>, 
+        /// <c>pallet_not_found</c>, <c>occupied</c>, apod.).
         /// Pomáhá určit, ve které fázi zpracování se aktuální order nachází.
         /// </summary>
-        [JsonPropertyName("event")]
-        public string? EventType { get; set; }
+        [JsonPropertyName("status")]
+        public string? Status { get; set; }
     }
 }

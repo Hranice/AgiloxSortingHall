@@ -37,3 +37,8 @@
 *.pdb
 *.gz
 *.br
+*.v2
+*.suo
+
+pswa.dswa.cache.json
+AgiloxSortingHall.sourcelink.json

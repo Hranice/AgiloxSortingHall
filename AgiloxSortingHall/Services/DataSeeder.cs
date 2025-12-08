@@ -1,4 +1,5 @@
 ﻿using AgiloxSortingHall.Data;
+using AgiloxSortingHall.Enums;
 using AgiloxSortingHall.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
