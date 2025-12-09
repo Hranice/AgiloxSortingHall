@@ -225,7 +225,7 @@ namespace AgiloxSortingHall.Pages
         /// v dané řadě, pokud je k dispozici volná paleta.
         /// Volná paleta = počet Occupied slotů > počet callů, které už
         /// mají přiřazené OrderId (tj. už na ně běží workflow).
-        /// OrderId je ID workflow vygenerované Agiloxem.
+        /// OrderId je ID orderu vygenerované Agiloxem.
         /// </summary>
         private async Task TryDispatchAgiloxForRowAsync(int hallRowId)
         {
@@ -283,7 +283,7 @@ namespace AgiloxSortingHall.Pages
             var json = JsonSerializer.Serialize(payload);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync("workflow/502", content);
+            var response = await client.PostAsync("workflow/501", content);
 
             var responseBody = await response.Content.ReadAsStringAsync();
             _logger.LogInformation("Agilox odpověď pro řadu {Row}: {Body}", row.Name, responseBody);
@@ -328,7 +328,7 @@ namespace AgiloxSortingHall.Pages
 
             await _db.SaveChangesAsync();
 
-            _logger.LogInformation("Odeslán workflow 502 pro řadu {Row} a stůl {Table}, OrderId={Req}",
+            _logger.LogInformation("Odeslán workflow 501 pro řadu {Row} a stůl {Table}, OrderId={Req}",
                 row.Name, callToDispatch.WorkTable.Name, callToDispatch.OrderId);
         }
 

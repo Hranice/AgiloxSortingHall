@@ -3,8 +3,11 @@ using AgiloxSortingHall.Enums;
 using AgiloxSortingHall.Helpers;
 using AgiloxSortingHall.Models;
 using AgiloxSortingHall.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Json;
 
 namespace AgiloxSortingHall.Pages
 {
@@ -15,35 +18,37 @@ namespace AgiloxSortingHall.Pages
     {
         private readonly AppDbContext _db;
         private readonly ILogger<IndexModel> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public IndexModel(AppDbContext db, ILogger<IndexModel> logger)
+        public IndexModel(
+            AppDbContext db,
+            ILogger<IndexModel> logger,
+            IHttpClientFactory httpClientFactory)
         {
             _db = db;
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
         /// <summary>
         /// Pøehledové položky pro jednotlivé stoly
-        /// (stùl + pøípadný pending call).
+        /// (stùl + pending call + poslední call).
         /// </summary>
         public List<TableOverviewViewModel> Tables { get; set; } = new();
 
         public async Task OnGetAsync()
         {
-            // 1) Naèteme všechny stoly (vìtšinou jich je relativnì málo)
             var tables = await _db.WorkTables
                 .OrderBy(t => t.Name)
                 .ToListAsync();
 
             var tableIds = tables.Select(t => t.Id).ToList();
-
             if (!tableIds.Any())
             {
-                Tables = new List<TableOverviewViewModel>();
+                Tables = new();
                 return;
             }
 
-            // 2) Pending cally pro tyto stoly (max. pár kusù)
             var pendingCalls = await _db.RowCalls
                 .Include(c => c.HallRow)
                 .Where(c =>
@@ -51,7 +56,6 @@ namespace AgiloxSortingHall.Pages
                     c.Status == RowCallStatus.Pending)
                 .ToListAsync();
 
-            // Do dictionary: tableId -> pending call (vezmeme vždy ten nejnovìjší pro jistotu)
             var pendingByTable = pendingCalls
                 .GroupBy(c => c.WorkTableId)
                 .ToDictionary(
@@ -59,7 +63,6 @@ namespace AgiloxSortingHall.Pages
                     g => g.OrderByDescending(c => c.RequestedAt).First()
                 );
 
-            // 3) Poslední call (libovolného stavu) pro každý stùl – dìláme v DB pøes GroupBy
             var lastCalls = await _db.RowCalls
                 .Include(c => c.HallRow)
                 .Where(c => tableIds.Contains(c.WorkTableId))
@@ -72,7 +75,6 @@ namespace AgiloxSortingHall.Pages
             var lastByTable = lastCalls
                 .ToDictionary(c => c.WorkTableId, c => c);
 
-            // 4) Poskládáme viewmodely pro index
             Tables = tables
                 .Select(t =>
                 {
@@ -90,11 +92,53 @@ namespace AgiloxSortingHall.Pages
         }
 
         /// <summary>
-        /// Vrátí textový popis aktuální aktivity pro daný RowCall,
-        /// založený na OrderId, posledním Agilox statusu a akci.
+        /// Textový popis aktivity pro daný RowCall (kvùli kompatibilitì).
         /// </summary>
         public string GetActivityDescription(RowCall call)
-      => AgiloxActivityDescriptionHelper.GetActivityDescription(call);
-       
+            => AgiloxActivityDescriptionHelper.GetActivityDescription(call);
+
+        /// <summary>
+        /// Handler pro tlaèítko "Hotovo" na indexu.
+        /// Pošle na Agilox workflow 501, aby odvezl paletu od stolu
+        /// do øady "hotovo".
+        /// </summary>
+        public async Task<IActionResult> OnPostDoneAsync(int tableId)
+        {
+            var table = await _db.WorkTables.FindAsync(tableId);
+            if (table == null)
+            {
+                _logger.LogWarning("OnPostDoneAsync: stùl {TableId} nebyl nalezen.", tableId);
+                return RedirectToPage();
+            }
+
+            var client = _httpClientFactory.CreateClient("Agilox");
+
+            var payload = new Dictionary<string, string>
+            {
+                ["@TABLE"] = table.Name
+            };
+
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            _logger.LogInformation(
+                "OnPostDoneAsync: posílám workflow 502 (DONE) pro stùl {Table}. Payload={Payload}",
+                table.Name,
+                json);
+
+            var response = await client.PostAsync("workflow/502", content);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            _logger.LogInformation(
+                "OnPostDoneAsync: Agilox odpovìï pro DONE stùl {Table}: {Body}",
+                table.Name,
+                responseBody);
+
+            response.EnsureSuccessStatusCode();
+
+            // žádný stav v DB nemìníme – pøípadný callback zpracuje AgiloxService
+            return RedirectToPage();
+        }
+
     }
 }

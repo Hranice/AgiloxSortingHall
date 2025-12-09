@@ -25,7 +25,7 @@ namespace AgiloxSortingHall.Helpers
             {
                 return new AgiloxActivityViewModel
                 {
-                    Text = "čeká na doplnění palety skladníkem",
+                    Text = "Čeká na doplnění palety skladníkem",
                     Severity = AgiloxSeverity.Info,
                     IconCss = "bi-box-seam",
                     TextCss = "text-warning"
@@ -38,7 +38,7 @@ namespace AgiloxSortingHall.Helpers
             {
                 return new AgiloxActivityViewModel
                 {
-                    Text = "čeká se na reakci Agiloxu…",
+                    Text = "Čeká se na reakci Agiloxu…",
                     Severity = AgiloxSeverity.Info,
                     IconCss = "bi-hourglass-split",
                     TextCss = "text-info"
@@ -53,7 +53,7 @@ namespace AgiloxSortingHall.Helpers
             {
                 return new AgiloxActivityViewModel
                 {
-                    Text = "požadavek byl zrušen",
+                    Text = "Požadavek byl zrušen",
                     Severity = AgiloxSeverity.Warning,
                     IconCss = "bi-slash-circle",
                     TextCss = "text-warning"
@@ -67,7 +67,7 @@ namespace AgiloxSortingHall.Helpers
                 case AgiloxStatus.PalletNotFound:
                     return new AgiloxActivityViewModel
                     {
-                        Text = "paleta nebyla nalezena v řadě",
+                        Text = "Paleta nebyla nalezena v řadě",
                         Severity = AgiloxSeverity.Error,
                         IconCss = "bi-exclamation-octagon-fill",
                         TextCss = "text-danger"
@@ -77,7 +77,7 @@ namespace AgiloxSortingHall.Helpers
                 case AgiloxStatus.Occupied:
                     return new AgiloxActivityViewModel
                     {
-                        Text = "cílový stůl je obsazený",
+                        Text = "Cílový stůl je obsazený",
                         Severity = AgiloxSeverity.Error,
                         IconCss = "bi-exclamation-octagon-fill",
                         TextCss = "text-danger"
@@ -91,7 +91,7 @@ namespace AgiloxSortingHall.Helpers
                     {
                         return new AgiloxActivityViewModel
                         {
-                            Text = "paleta je v převozu",
+                            Text = "Paleta je v převozu",
                             Severity = AgiloxSeverity.Info,
                             IconCss = "bi-clock",
                             TextCss = "text-primary"
@@ -103,7 +103,7 @@ namespace AgiloxSortingHall.Helpers
                     {
                         return new AgiloxActivityViewModel
                         {
-                            Text = "paleta byla doručena",
+                            Text = "Paleta byla doručena",
                             Severity = AgiloxSeverity.Info,
                             IconCss = "bi-check-circle-fill",
                             TextCss = "text-success"

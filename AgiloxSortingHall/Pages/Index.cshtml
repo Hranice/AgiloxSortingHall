@@ -58,94 +58,120 @@
 
                 // poslední chyba/varování i bez pending callu
                 var hasLastError = !hasPending &&
-                                   activityVm != null &&
-                                   activityVm.Severity != AgiloxSeverity.Info;
+                activityVm != null &&
+                activityVm.Severity != AgiloxSeverity.Info;
+
+                var hasArticleOrRow = !string.IsNullOrWhiteSpace(article) || rowName != "neznámá řada";
+
+                var detailUrl = Url.Page("/Stul", new { id = table.Id });
 
                 <div class="col-12 col-md-6 col-lg-4 d-flex">
+                    <div class="bg-dark text-light border border-secondary rounded-3
+                                        flex-fill p-4 text-start d-flex flex-column justify-content-between shadow-sm
+                                        js-table-card"
+                         data-url="@detailUrl">
 
-                    <a asp-page="/Stul"
-                       asp-route-id="@table.Id"
-                       class="btn bg-dark text-light border border-secondary rounded-3
-                              flex-fill p-4 text-start d-flex flex-column justify-content-between shadow-sm">
+                        <!-- Horní řádek: ikonka + název + Odvézt -->
+                        <div class="d-flex align-items-center justify-content-between mb-3">
 
-                        <!-- Horní část dlaždice: ikonka + název -->
-                        <div class="d-flex align-items-center mb-2">
-
-                            @if (hasPending && activityVm != null)
-                            {
-                                if (activityVm.Severity == AgiloxSeverity.Error)
+                            <div class="d-flex align-items-center">
+                                @* Ikonka stavu *@
+                                @if (hasPending && activityVm != null)
                                 {
-                                    <i class="bi bi-exclamation-octagon-fill text-danger fs-2 me-3"></i>
-                                }
-                                else if (activityVm.Severity == AgiloxSeverity.Warning)
-                                {
-                                    <i class="bi bi-exclamation-triangle-fill text-warning fs-2 me-3"></i>
-                                }
-                                else if (isWaitingForWarehouse)
-                                {
-                                    <!-- čeká se na doplnění palety = žlutá krabice -->
-                                    <i class="bi bi-box-seam text-warning fs-2 me-3"></i>
+                                    if (activityVm.Severity == AgiloxSeverity.Error)
+                                    {
+                                        <i class="bi bi-exclamation-octagon-fill text-danger fs-2 me-3"></i>
+                                    }
+                                    else if (activityVm.Severity == AgiloxSeverity.Warning)
+                                    {
+                                        <i class="bi bi-exclamation-triangle-fill text-warning fs-2 me-3"></i>
+                                    }
+                                    else if (isWaitingForWarehouse)
+                                    {
+                                        <i class="bi bi-box-seam text-warning fs-2 me-3"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi @activityVm.IconCss @activityVm.TextCss fs-2 me-3"></i>
+                                    }
                                 }
                                 else
                                 {
-                                    <!-- Využijeme ikonku i barvu z helperu
-                                         -> převoz = modrá, station occupied = červená, atd. -->
-                                    <i class="bi @activityVm.IconCss @activityVm.TextCss fs-2 me-3"></i>
+                                    <i class="bi bi-check-circle-fill text-success fs-2 me-3"></i>
                                 }
-                            }
-                            else
-                            {
-                                <!-- žádný pending call = zelený check -->
-                                <i class="bi bi-check-circle-fill text-success fs-2 me-3"></i>
-                            }
 
-                            <span class="fs-2 fw-semibold">@table.Name</span>
+                                @* Název stolu (klik řeší kartička přes JS) *@
+                                <span class="fs-2 fw-semibold text-light">
+                                    @table.Name
+                                </span>
+                            </div>
+
+                            @* Tlačítko Odvézt – pouze pokud není pending *@
+                            @if (!hasPending)
+                            {
+                                <form method="post" asp-page-handler="Done" class="m-0 js-stop-click">
+                                    <input type="hidden" name="tableId" value="@table.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-done btn-lg d-flex align-items-center px-3 py-2"
+                                            title="Označit jako odvézt – odvézt paletu od stolu do řady">
+                                        <i class="bi bi-check2-circle fs-4 me-1"></i>
+                                        Odvézt
+                                    </button>
+                                </form>
+                            }
                         </div>
 
-                        <!-- Spodní část dlaždice: text -->
-                        <div class="mt-2">
+                        <!-- Stav + 3 fixní řádky pro zarovnání -->
+                        <div class="mt-1">
 
-                            @if (hasPending && activityVm != null)
-                            {
-                                <div class="@activityVm.TextCss fw-semibold fs-5 mb-1">
-                                    @activityVm.Text
-                                </div>
-
-                                <div class="text-light small opacity-75">
-                                    <i class="bi @activityVm.IconCss me-1"></i>
-                                    @article - @rowName
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="text-success fw-semibold fs-5 mb-1">
-                                    Připraveno
-                                </div>
-
-                                @if (hasLastError && activityVm != null)
+                            @* 1. řádek – hlavní stav, vždy *@
+                            <div class="fw-semibold fs-5 @(hasPending && activityVm != null ? activityVm.TextCss : "text-success")">
+                                @if (hasPending && activityVm != null)
                                 {
-                                    <div class="small @activityVm.TextCss mt-1">
-                                        Poslední stav:
+                                    @activityVm.Text
+                                }
+                                else
+                                {
+                                    @:Připraveno
+                                }
+                            </div>
+
+                            @* 2. řádek – artikl a řada (nebo prázdná linka kvůli zarovnání) *@
+                            <div class="text-light small opacity-75 mt-1">
+                                @if (hasArticleOrRow)
+                                {
+                                    <i class="bi bi-box-seam me-1"></i>
+                                    @($"{article} - {@rowName}")
+                                                        }
+                                else
+                                {
+                                    @:&nbsp;
+                                }
+                            </div>
+
+                            @* 3. řádek – poslední stav / "žádný požadavek" / prázdno u pending *@
+                            <div class="small mt-1 @(hasLastError && !hasPending && activityVm != null ? activityVm.TextCss : "text-secondary")">
+                                @if (!hasPending)
+                                {
+                                    @if (hasLastError && activityVm != null)
+                                    {
                                         <i class="bi @activityVm.IconCss me-1"></i>
                                         @activityVm.Text
-
-                                        @if (!string.IsNullOrWhiteSpace(article))
-                                        {
-                                            <span class="opacity-75"> (@article - @rowName)</span>
-                                        }
-                                    </div>
+                                    }
+                                    else
+                                    {
+                                        @:Žádný čekající požadavek.
+                                    }
                                 }
                                 else
                                 {
-                                    <div class="text-secondary">
-                                        Žádný čekající požadavek.
-                                    </div>
+                                    @:&nbsp;
                                 }
-                            }
-
+                            </div>
                         </div>
 
-                    </a>
+                    </div>
                 </div>
             }
 
@@ -153,3 +179,26 @@
     }
 
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Klik na celou dlaždici -> přechod na detail stolu
+            document.querySelectorAll('.js-table-card').forEach(function (card) {
+                card.addEventListener('click', function (e) {
+                    // pokud klikneme na tlačítko / form uvnitř, neřešíme navigaci
+                    if (e.target.closest('.js-stop-click') ||
+                        e.target.closest('button') ||
+                        e.target.closest('a[href]')) {
+                        return;
+                    }
+
+                    var url = card.getAttribute('data-url');
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+        });
+    </script>
+}

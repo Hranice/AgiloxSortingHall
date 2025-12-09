@@ -204,7 +204,7 @@ namespace AgiloxSortingHall.Pages
             }
 
             // pošli workflow a vezmi si raw body
-            var responseBody = await SendWorkflow502Async(row, callToDispatch);
+            var responseBody = await SendWorkflowAsync(row, callToDispatch);
 
             // zkus vytáhnout ID z odpovìdi Agiloxu
             var agiloxId = TryParseAgiloxId(responseBody);
@@ -222,7 +222,7 @@ namespace AgiloxSortingHall.Pages
             await _db.SaveChangesAsync();
 
             _logger.LogInformation(
-                "Skladník – odeslán workflow 502 pro øadu {Row} a stùl {Table}, OrderId={Req}",
+                "Skladník – odeslán workflow 501 pro øadu {Row} a stùl {Table}, OrderId={Req}",
                 row.Name,
                 callToDispatch.WorkTable.Name,
                 callToDispatch.OrderId);
@@ -262,10 +262,10 @@ namespace AgiloxSortingHall.Pages
         }
 
         /// <summary>
-        /// Odešle na Agilox workflow 502 pro danou øadu a stùl
+        /// Odešle na Agilox workflow pro danou øadu a stùl
         /// a vrátí tìlo HTTP odpovìdi jako string.
         /// </summary>
-        private async Task<string> SendWorkflow502Async(HallRow row, RowCall callToDispatch)
+        private async Task<string> SendWorkflowAsync(HallRow row, RowCall callToDispatch)
         {
             var client = _httpClientFactory.CreateClient("Agilox");
 
@@ -278,7 +278,7 @@ namespace AgiloxSortingHall.Pages
             var json = JsonSerializer.Serialize(payload);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync("workflow/502", content);
+            var response = await client.PostAsync("workflow/501", content);
 
             var responseBody = await response.Content.ReadAsStringAsync();
             _logger.LogInformation(

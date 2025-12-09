@@ -367,34 +367,68 @@ html.dark-mode .btn-outline-primary {
     }
 
 
-.agilox-modal.fade .modal-dialog {
-    transition: transform .3s ease-out, opacity .3s ease-out;
-    transform: translateY(-20px);
-    opacity: 0;
+/* Globální override Bootstrap success pro dark UI */
+.btn-success,
+.bg-success,
+.border-success,
+.text-success {
+    color: #28d17c !important; /* základní barva textu */
 }
 
-.agilox-modal.show .modal-dialog {
-    transform: translateY(0);
-    opacity: 1;
+.btn-success {
+    background-color: #28d17c !important;
+    border-color: #1fb86a !important;
 }
 
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: .8;
+    .btn-success:hover {
+        background-color: #2fe389 !important;
+        border-color: #23c576 !important;
     }
 
-    50% {
-        transform: scale(1.15);
-        opacity: 1;
+    .btn-success:active {
+        background-color: #21b96c !important;
+        border-color: #1da45f !important;
     }
 
-    100% {
-        transform: scale(1);
-        opacity: .8;
+    /* Ikona success */
+    .text-success i,
+    .btn-success i {
+        color: #000 !important;
     }
+
+/* Alert Success */
+.alert-success {
+    background-color: rgba(40, 209, 124, 0.15) !important;
+    border-color: #28d17c !important;
+    color: #28d17c !important;
 }
 
-.agilox-pulse {
-    animation: pulse 1.5s infinite;
+/* Badge Success */
+.badge.bg-success {
+    background-color: #28d17c !important;
+    color: #000 !important;
 }
+
+.btn-done {
+    background-color: #28d17c; /* jasná zelená */
+    border: 1px solid #1fb86a;
+    color: #000; /* černý text kvůli kontrastu */
+    font-weight: 600;
+    border-radius: 8px;
+    transition: 0.15s ease-in-out;
+}
+
+    .btn-done:hover {
+        background-color: #2fe389; /* světlejší */
+        border-color: #23c576;
+        color: #000;
+    }
+
+    .btn-done:active {
+        background-color: #21b96c;
+        border-color: #1da45f;
+    }
+
+    .btn-done i {
+        color: #000 !important;
+    }
