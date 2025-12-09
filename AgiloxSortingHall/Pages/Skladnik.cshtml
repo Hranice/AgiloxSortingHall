@@ -2,6 +2,7 @@
 @using AgiloxSortingHall.Enums
 @using AgiloxSortingHall.Models
 @using AgiloxSortingHall.ViewModels
+@using AgiloxSortingHall.Helpers
 @model AgiloxSortingHall.Pages.SkladnikModel
 
 @{
@@ -113,6 +114,16 @@
     <div class="hall-columns-container">
         @foreach (var row in Model.Rows)
         {
+            // najdeme případný pending call pro danou řadu (např. occupied)
+            var rowCalls = Model.PendingCalls.Where(c => c.HallRowId == row.Id).ToList();
+            AgiloxActivityViewModel? rowActivity = null;
+            if (rowCalls.Any())
+            {
+                // vezmeme ten nejnovější
+                var lastCall = rowCalls.OrderByDescending(c => c.RequestedAt).First();
+                rowActivity = AgiloxActivityDescriptionHelper.GetActivityUi(lastCall);
+            }
+
             <div class="hall-column">
 
                 @await Html.PartialAsync(
@@ -126,40 +137,49 @@
                         }
                         )
 
-            <form method="post" class="w-100 mt-2" id="row-form-@row.Id">
-                <input type="hidden" name="rowId" value="@row.Id" />
-
-                <div class="input-group mb-2">
-                    <input type="text"
-                           class="form-control form-control-lg bg-dark text-light border-secondary"
-                           placeholder="Název artiklu"
-                           name="RowArticle[@row.Id]"
-                           value="@(Model.RowArticle[row.Id])" />
-
-                    <button class="btn btn-dark btn-lg d-flex align-items-center justify-content-center border-secondary"
-                            type="submit"
-                            asp-page-handler="SetArticle">
-                        <i class="bi bi-pencil-fill fs-4 text-info"></i>
-                    </button>
-                </div>
-
-                <button class="btn btn-success btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center icon-white"
-                        type="submit"
-                        asp-page-handler="AddPallet">
-                    <i class="bi bi-plus-lg me-2"></i>
-                </button>
-
-                <!-- Odebrání palety – otevře potvrzovací modal a předá rowId -->
-                <button class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold mt-2 d-flex align-items-center justify-content-center border-danger icon-white"
-                        type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#confirmRemoveModal"
-                        data-row-id="@row.Id">
-                    <i class="bi bi-dash-lg me-2"></i>
-                </button>
-            </form>
-        </div>
+            @* případná hláška k řadě (occupied / error) *@
+            @if (rowActivity != null && rowActivity.Severity != AgiloxSeverity.Info)
+                {
+                    <div class="mt-1 small @rowActivity.TextCss">
+                        <i class="bi @rowActivity.IconCss me-1"></i>
+                        @rowActivity.Text
+                    </div>
                 }
+
+                <form method="post" class="w-100 mt-2" id="row-form-@row.Id">
+                    <input type="hidden" name="rowId" value="@row.Id" />
+
+                    <div class="input-group mb-2">
+                        <input type="text"
+                               class="form-control form-control-lg bg-dark text-light border-secondary"
+                               placeholder="Název artiklu"
+                               name="RowArticle[@row.Id]"
+                               value="@(Model.RowArticle[row.Id])" />
+
+                        <button class="btn btn-dark btn-lg d-flex align-items-center justify-content-center border-secondary"
+                                type="submit"
+                                asp-page-handler="SetArticle">
+                            <i class="bi bi-pencil-fill fs-4 text-info"></i>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-success btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center icon-white"
+                            type="submit"
+                            asp-page-handler="AddPallet">
+                        <i class="bi bi-plus-lg me-2"></i>
+                    </button>
+
+                    <!-- Odebrání palety – otevře potvrzovací modal a předá rowId -->
+                    <button class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold mt-2 d-flex align-items-center justify-content-center border-danger icon-white"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmRemoveModal"
+                            data-row-id="@row.Id">
+                        <i class="bi bi-dash-lg me-2"></i>
+                    </button>
+                </form>
+            </div>
+        }
     </div>
 </div>
 

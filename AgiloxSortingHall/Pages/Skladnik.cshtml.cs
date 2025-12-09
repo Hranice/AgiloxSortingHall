@@ -271,8 +271,8 @@ namespace AgiloxSortingHall.Pages
 
             var payload = new Dictionary<string, string>
             {
-                ["@ZAKLIKNUTARADA"] = row.Name,
-                ["@PRIJEMCE"] = callToDispatch.WorkTable.Name
+                ["@ROW"] = row.Name,
+                ["@TABLE"] = callToDispatch.WorkTable.Name
             };
 
             var json = JsonSerializer.Serialize(payload);
@@ -327,7 +327,6 @@ namespace AgiloxSortingHall.Pages
 
             return null;
         }
-
 
         /// <summary>
         /// Odebrání jedné palety z dané øady.

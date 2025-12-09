@@ -120,32 +120,36 @@ namespace AgiloxSortingHall.Pages
             return RedirectToPage(new { id });
         }
 
-
         /// <summary>
         /// Zavolání "artiklu" – uživatel neřeší konkrétní řadu,
         /// jen řekne "chci tento artikl". Backend si vybere nějakou řadu
-        /// s tímto artiklem (zatím bereme první podle názvu).
+        /// s tímto artiklem podle nastavené strategie.
         /// </summary>
         public async Task<IActionResult> OnPostCallArticleAsync(int id, string article)
         {
+            _logger.LogInformation("OnPostCallArticleAsync HIT: id={Id}, article={Article}", id, article);
+
             if (await HasPendingCallForTableAsync(id))
-                return RedirectToPage(new { id });
+                return RedirectToPage("/Index");
 
             var table = await _db.WorkTables.FindAsync(id);
             if (table == null)
-                return RedirectToPage(new { id });
+                return RedirectToPage("/Index");
 
             var selectedRow = await SelectRowForArticleAsync(article);
             if (selectedRow == null)
             {
                 // žádná řada s tímto artiklem
-                return RedirectToPage(new { id });
+                return RedirectToPage("/Index");
             }
 
             await CreateCallAndDispatchAsync(table, selectedRow);
 
             await _hub.Clients.All.SendAsync("HallUpdated");
-            return RedirectToPage(new { id });
+
+            _logger.LogInformation("OnPostCallArticleAsync finished OK, redirecting to Index");
+
+            return RedirectToPage("/Index");
         }
 
         /// <summary>
@@ -175,7 +179,8 @@ namespace AgiloxSortingHall.Pages
             _db.RowCalls.Add(call);
             await _db.SaveChangesAsync();
 
-            await TryDispatchAgiloxForRowAsync(row, table);
+            // po vytvoření požadavku hned zkusíme dispatchnout na Agilox
+            await TryDispatchAgiloxForRowAsync(row.Id);
         }
 
         /// <summary>
@@ -215,7 +220,6 @@ namespace AgiloxSortingHall.Pages
             }
         }
 
-
         /// <summary>
         /// Zkusí spustit workflow na Agiloxe pro první čekající RowCall
         /// v dané řadě, pokud je k dispozici volná paleta.
@@ -223,8 +227,18 @@ namespace AgiloxSortingHall.Pages
         /// mají přiřazené OrderId (tj. už na ně běží workflow).
         /// OrderId je ID workflow vygenerované Agiloxem.
         /// </summary>
-        private async Task TryDispatchAgiloxForRowAsync(HallRow row, WorkTable table)
+        private async Task TryDispatchAgiloxForRowAsync(int hallRowId)
         {
+            var row = await _db.HallRows
+                .Include(r => r.Slots)
+                .FirstOrDefaultAsync(r => r.Id == hallRowId);
+
+            if (row == null)
+            {
+                _logger.LogWarning("TryDispatchAgiloxForRowAsync: HallRow {RowId} nebyla nalezena.", hallRowId);
+                return;
+            }
+
             // spočítáme počet fyzicky obsazených slotů (palet) v řadě
             var occupiedCount = row.Slots.Count(s => s.State == PalletState.Occupied);
 
@@ -262,8 +276,8 @@ namespace AgiloxSortingHall.Pages
 
             var payload = new Dictionary<string, string>
             {
-                ["@ZAKLIKNUTARADA"] = row.Name,                    // např. "Řada3"
-                ["@PRIJEMCE"] = callToDispatch.WorkTable.Name // např. "Stůl 1"
+                ["@ROW"] = row.Name,                          // např. "Řada3"
+                ["@TABLE"] = callToDispatch.WorkTable.Name   // např. "Stůl 1"
             };
 
             var json = JsonSerializer.Serialize(payload);
@@ -318,14 +332,11 @@ namespace AgiloxSortingHall.Pages
                 row.Name, callToDispatch.WorkTable.Name, callToDispatch.OrderId);
         }
 
-
-
-
         /// <summary>
         /// Zruší nejnovější pending RowCall daného stolu.
         /// Pokud má call přiřazené OrderId (ID workflow v Agiloxu),
         /// pokusí se zrušit související order i na Agiloxu přímo podle tohoto ID.
-        /// Poté označí call jako Cancelled.
+        /// Poté označí call jako Cancelled a zkusí posunout frontu.
         /// </summary>
         public async Task<IActionResult> OnPostCancelCallAsync(int id)
         {
@@ -376,11 +387,13 @@ namespace AgiloxSortingHall.Pages
             call.Status = RowCallStatus.Cancelled;
             await _db.SaveChangesAsync();
 
+            // 🔁 po zrušení požadavku zkusíme frontu pro danou řadu posunout
+            await TryDispatchAgiloxForRowAsync(call.HallRowId);
+
             await _hub.Clients.All.SendAsync("HallUpdated");
 
             return RedirectToPage(new { id });
         }
-
 
         /// <summary>
         /// Vrátí počet "volných" palet v dané řadě – tj.
@@ -428,6 +441,6 @@ namespace AgiloxSortingHall.Pages
         }
 
         public string GetActivityDescription(RowCall call)
-       => AgiloxActivityDescriptionHelper.GetActivityDescription(call);
+            => AgiloxActivityDescriptionHelper.GetActivityDescription(call);
     }
 }

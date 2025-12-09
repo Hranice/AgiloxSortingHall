@@ -1,5 +1,8 @@
 ﻿@page
 @using AgiloxSortingHall.Models
+@using AgiloxSortingHall.Helpers
+@using AgiloxSortingHall.ViewModels
+@using AgiloxSortingHall.Enums
 @model AgiloxSortingHall.Pages.IndexModel
 @{
     ViewData["Title"] = "Výběr stolu";
@@ -36,53 +39,110 @@
             @foreach (var item in Model.Tables)
             {
                 var table = item.Table;
-                var call = item.PendingCall;
-                var hasPending = call != null;
-                var rowName = call?.HallRow?.Name ?? "neznámá řada";
-                var article = call?.HallRow?.Article;
-                var activity = call != null ? Model.GetActivityDescription(call) : null;
+                var pendingCall = item.PendingCall;
+                var lastCall = item.LastCall;
+
+                var hasPending = pendingCall != null;
+
+                // call, ze kterého bereme popis stavu (pending > last)
+                var callForInfo = pendingCall ?? lastCall;
+
+                AgiloxActivityViewModel? activityVm = null;
+                if (callForInfo != null)
+                    activityVm = AgiloxActivityDescriptionHelper.GetActivityUi(callForInfo);
+
+                var rowName = callForInfo?.HallRow?.Name ?? "neznámá řada";
+                var article = callForInfo?.HallRow?.Article;
+
+                var isWaitingForWarehouse = hasPending && pendingCall!.OrderId == null;
+
+                // poslední chyba/varování i bez pending callu
+                var hasLastError = !hasPending &&
+                                   activityVm != null &&
+                                   activityVm.Severity != AgiloxSeverity.Info;
 
                 <div class="col-12 col-md-6 col-lg-4 d-flex">
+
                     <a asp-page="/Stul"
                        asp-route-id="@table.Id"
                        class="btn bg-dark text-light border border-secondary rounded-3
-                                              flex-fill p-4 text-start d-flex flex-column justify-content-between shadow-sm">
+                              flex-fill p-4 text-start d-flex flex-column justify-content-between shadow-sm">
 
-                        <!-- Horní část: ikona stavu + název stolu -->
+                        <!-- Horní část dlaždice: ikonka + název -->
                         <div class="d-flex align-items-center mb-2">
 
-                            @if (!hasPending)
+                            @if (hasPending && activityVm != null)
                             {
-                                <i class="bi bi-check-circle-fill text-success fs-2 me-3"></i>
+                                if (activityVm.Severity == AgiloxSeverity.Error)
+                                {
+                                    <i class="bi bi-exclamation-octagon-fill text-danger fs-2 me-3"></i>
+                                }
+                                else if (activityVm.Severity == AgiloxSeverity.Warning)
+                                {
+                                    <i class="bi bi-exclamation-triangle-fill text-warning fs-2 me-3"></i>
+                                }
+                                else if (isWaitingForWarehouse)
+                                {
+                                    <!-- čeká se na doplnění palety = žlutá krabice -->
+                                    <i class="bi bi-box-seam text-warning fs-2 me-3"></i>
+                                }
+                                else
+                                {
+                                    <!-- Využijeme ikonku i barvu z helperu
+                                         -> převoz = modrá, station occupied = červená, atd. -->
+                                    <i class="bi @activityVm.IconCss @activityVm.TextCss fs-2 me-3"></i>
+                                }
                             }
                             else
                             {
-                                <i class="bi bi-clock-fill text-warning fs-2 me-3"></i>
+                                <!-- žádný pending call = zelený check -->
+                                <i class="bi bi-check-circle-fill text-success fs-2 me-3"></i>
                             }
 
                             <span class="fs-2 fw-semibold">@table.Name</span>
                         </div>
 
-                        <!-- Spodní část: textový popis stavu -->
+                        <!-- Spodní část dlaždice: text -->
                         <div class="mt-2">
-                            @if (!hasPending)
+
+                            @if (hasPending && activityVm != null)
                             {
-                                <div class="text-success fw-semibold fs-5 mb-1">
-                                    Připraveno
+                                <div class="@activityVm.TextCss fw-semibold fs-5 mb-1">
+                                    @activityVm.Text
                                 </div>
-                                <div class="text-secondary">
-                                    Žádný čekající požadavek.
+
+                                <div class="text-light small opacity-75">
+                                    <i class="bi @activityVm.IconCss me-1"></i>
+                                    @article - @rowName
                                 </div>
                             }
                             else
                             {
-                                <div class="text-warning fw-semibold fs-5 mb-1">
-                                    Probíhá požadavek
+                                <div class="text-success fw-semibold fs-5 mb-1">
+                                    Připraveno
                                 </div>
-                                <div class="text-light small opacity-75">
-                                    @activity (@article - @rowName)
-                                </div>
+
+                                @if (hasLastError && activityVm != null)
+                                {
+                                    <div class="small @activityVm.TextCss mt-1">
+                                        Poslední stav:
+                                        <i class="bi @activityVm.IconCss me-1"></i>
+                                        @activityVm.Text
+
+                                        @if (!string.IsNullOrWhiteSpace(article))
+                                        {
+                                            <span class="opacity-75"> (@article - @rowName)</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-secondary">
+                                        Žádný čekající požadavek.
+                                    </div>
+                                }
                             }
+
                         </div>
 
                     </a>

@@ -1,79 +1,138 @@
 ﻿using AgiloxSortingHall.Enums;
 using AgiloxSortingHall.Models;
+using AgiloxSortingHall.ViewModels;
 
 namespace AgiloxSortingHall.Helpers
 {
     /// <summary>
-    /// Pomocné metody pro převod Agilox callback stavů (status + action)
-    /// na čitelný text pro UI.
+    /// Převod Agilox callback dat (status + action) do UI-friendly viewmodelu.
     /// </summary>
     public static class AgiloxActivityDescriptionHelper
     {
         /// <summary>
-        /// Vrátí textový popis aktuální aktivity pro daný RowCall,
-        /// založený na OrderId, posledním Agilox statusu a akci.
+        /// Vrací jen textový popis (zpětná kompatibilita).
         /// </summary>
         public static string GetActivityDescription(RowCall call)
-        {
-            // Ještě nemáme OrderId -> požadavek je jen v systému, Agilox o něm neví.
-            if (call.OrderId == null)
-                return "čeká na doplnění palety skladníkem";
+            => GetActivityUi(call).Text;
 
-            // Máme OrderId, ale zatím žádná reakce z Agiloxu
+        /// <summary>
+        /// Kompletní UI model (text, barva, ikona, závažnost).
+        /// </summary>
+        public static AgiloxActivityViewModel GetActivityUi(RowCall call)
+        {
+            // Stále čekáme na paletu – skladník ji nepřinesl
+            if (call.OrderId == null)
+            {
+                return new AgiloxActivityViewModel
+                {
+                    Text = "čeká na doplnění palety skladníkem",
+                    Severity = AgiloxSeverity.Info,
+                    IconCss = "bi-box-seam",
+                    TextCss = "text-warning"
+                };
+            }
+
+            // Máme OrderId, ale robot ještě neposlal první callback
             if (string.IsNullOrWhiteSpace(call.LastAgiloxStatus) &&
                 string.IsNullOrWhiteSpace(call.LastAgiloxAction))
             {
-                return "objednávka byla odeslána do Agiloxu, čeká se na první reakci robota";
+                return new AgiloxActivityViewModel
+                {
+                    Text = "čeká se na reakci Agiloxu…",
+                    Severity = AgiloxSeverity.Info,
+                    IconCss = "bi-hourglass-split",
+                    TextCss = "text-info"
+                };
             }
 
             var status = ParseStatus(call.LastAgiloxStatus);
             var action = ParseAction(call.LastAgiloxAction);
 
-            // Stav order_canceled – nezávisle na akci
+            // Order canceled
             if (status == AgiloxStatus.OrderCanceled)
             {
-                return "požadavek byl zrušen, Agilox paletu bezpečně odkládá podle interního workflow";
+                return new AgiloxActivityViewModel
+                {
+                    Text = "požadavek byl zrušen",
+                    Severity = AgiloxSeverity.Warning,
+                    IconCss = "bi-slash-circle",
+                    TextCss = "text-warning"
+                };
             }
 
-            // Standardní kombinace
+            // Specifické chování podle stavu
             switch (status)
             {
+                // Paleta nebyla nalezena
                 case AgiloxStatus.PalletNotFound:
-                    // pickup + pallet_not_found -> paleta v řadě nebyla nalezena
-                    return "paleta nebyla nalezena v řadě, požadavek nelze dokončit";
-
-                case AgiloxStatus.Occupied:
-                    // drop + occupied -> cíl (stůl) je obsazený
-                    return "cílový stůl je obsazený, Agilox čeká na jeho uvolnění";
-
-                case AgiloxStatus.Ok:
-                    // OK se vyhodnocuje podle typu akce
-                    return action switch
+                    return new AgiloxActivityViewModel
                     {
-                        AgiloxAction.Pickup =>
-                            "Agilox naložil paletu z řady a jede s ní ke stolu",
-
-                        AgiloxAction.Drop =>
-                            "paleta byla doručena ke stolu",
-
-                        _ =>
-                            "Agilox úspěšně dokončil krok workflow"
+                        Text = "paleta nebyla nalezena v řadě",
+                        Severity = AgiloxSeverity.Error,
+                        IconCss = "bi-exclamation-octagon-fill",
+                        TextCss = "text-danger"
                     };
 
-                case AgiloxStatus.Unknown:
+                // Cílový stůl obsazený
+                case AgiloxStatus.Occupied:
+                    return new AgiloxActivityViewModel
+                    {
+                        Text = "cílový stůl je obsazený",
+                        Severity = AgiloxSeverity.Error,
+                        IconCss = "bi-exclamation-octagon-fill",
+                        TextCss = "text-danger"
+                    };
+
+                // OK – odlišujeme pickup/drop
+                case AgiloxStatus.Ok:
+
+                    // PICKUP OK -> paleta je v převozu
+                    if (action == AgiloxAction.Pickup)
+                    {
+                        return new AgiloxActivityViewModel
+                        {
+                            Text = "paleta je v převozu",
+                            Severity = AgiloxSeverity.Info,
+                            IconCss = "bi-clock",
+                            TextCss = "text-primary"
+                        };
+                    }
+
+                    // DROP OK -> doručeno
+                    if (action == AgiloxAction.Drop)
+                    {
+                        return new AgiloxActivityViewModel
+                        {
+                            Text = "paleta byla doručena",
+                            Severity = AgiloxSeverity.Info,
+                            IconCss = "bi-check-circle-fill",
+                            TextCss = "text-success"
+                        };
+                    }
+
+                    // fallback
+                    return new AgiloxActivityViewModel
+                    {
+                        Text = "Agilox úspěšně dokončil krok",
+                        Severity = AgiloxSeverity.Info,
+                        IconCss = "bi-check",
+                        TextCss = "text-info"
+                    };
+
                 default:
-                    return "Agilox zpracovává požadavek";
+                    return new AgiloxActivityViewModel
+                    {
+                        Text = "Agilox zpracovává požadavek",
+                        Severity = AgiloxSeverity.Info,
+                        IconCss = "bi-hourglass",
+                        TextCss = "text-secondary"
+                    };
             }
         }
 
-        /// <summary>
-        /// Převede uložený string statusu na enum <see cref="AgiloxStatus"/>.
-        /// Pracuje pouze s hodnotami popsanými v dokumentaci (ok, pallet_not_found, occupied, order_canceled).
-        /// </summary>
         private static AgiloxStatus ParseStatus(string? raw)
         {
-            if (string.IsNullOrWhiteSpace(raw))
-                return AgiloxStatus.Unknown;
+            if (raw == null) return AgiloxStatus.Unknown;
 
             return raw.Trim().ToLowerInvariant() switch
             {
@@ -85,14 +144,9 @@ namespace AgiloxSortingHall.Helpers
             };
         }
 
-        /// <summary>
-        /// Převede uložený string akce na enum <see cref="AgiloxAction"/>.
-        /// Očekává hodnoty "pickup" nebo "drop" dle dokumentace.
-        /// </summary>
         private static AgiloxAction ParseAction(string? raw)
         {
-            if (string.IsNullOrWhiteSpace(raw))
-                return AgiloxAction.Unknown;
+            if (raw == null) return AgiloxAction.Unknown;
 
             return raw.Trim().ToLowerInvariant() switch
             {

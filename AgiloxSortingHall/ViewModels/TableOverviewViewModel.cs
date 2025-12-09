@@ -3,20 +3,25 @@
 namespace AgiloxSortingHall.ViewModels
 {
     /// <summary>
-    /// Přehled jednoho stolu pro úvodní stránku:
-    /// samotný stůl + případný čekající požadavek (RowCall).
+    /// Přehledová položka pro jeden stůl – obsahuje stůl,
+    /// případný pending call a poslední call (libovolného stavu).
     /// </summary>
     public class TableOverviewViewModel
     {
         /// <summary>
-        /// Entita stolu z databáze.
+        /// Pracovní stůl.
         /// </summary>
         public WorkTable Table { get; set; } = null!;
 
         /// <summary>
-        /// Nejnovější pending call pro tento stůl (pokud existuje).
-        /// Stůl má v logice aplikace max. jeden pending call.
+        /// Aktuální čekající (pending) požadavek pro tento stůl, pokud existuje.
         /// </summary>
         public RowCall? PendingCall { get; set; }
+
+        /// <summary>
+        /// Poslední RowCall pro tento stůl dle RequestedAt (může být Delivered/Cancelled),
+        /// slouží k zobrazení posledního známého stavu (např. pallet_not_found).
+        /// </summary>
+        public RowCall? LastCall { get; set; }
     }
 }

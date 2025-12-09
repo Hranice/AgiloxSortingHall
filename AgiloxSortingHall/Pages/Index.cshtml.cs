@@ -30,27 +30,60 @@ namespace AgiloxSortingHall.Pages
 
         public async Task OnGetAsync()
         {
-            // Naèteme všechny stoly
+            // 1) Naèteme všechny stoly (vìtšinou jich je relativnì málo)
             var tables = await _db.WorkTables
                 .OrderBy(t => t.Name)
                 .ToListAsync();
 
-            // Naèteme všechny pending call-y (vèetnì øady kvùli zobrazení)
+            var tableIds = tables.Select(t => t.Id).ToList();
+
+            if (!tableIds.Any())
+            {
+                Tables = new List<TableOverviewViewModel>();
+                return;
+            }
+
+            // 2) Pending cally pro tyto stoly (max. pár kusù)
             var pendingCalls = await _db.RowCalls
                 .Include(c => c.HallRow)
-                .Where(c => c.Status == RowCallStatus.Pending)
-                .OrderByDescending(c => c.RequestedAt)
+                .Where(c =>
+                    tableIds.Contains(c.WorkTableId) &&
+                    c.Status == RowCallStatus.Pending)
                 .ToListAsync();
 
-            // Pro každý stùl najdeme jeho pending call (pokud nìjaký má)
+            // Do dictionary: tableId -> pending call (vezmeme vždy ten nejnovìjší pro jistotu)
+            var pendingByTable = pendingCalls
+                .GroupBy(c => c.WorkTableId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderByDescending(c => c.RequestedAt).First()
+                );
+
+            // 3) Poslední call (libovolného stavu) pro každý stùl – dìláme v DB pøes GroupBy
+            var lastCalls = await _db.RowCalls
+                .Include(c => c.HallRow)
+                .Where(c => tableIds.Contains(c.WorkTableId))
+                .GroupBy(c => c.WorkTableId)
+                .Select(g => g
+                    .OrderByDescending(c => c.RequestedAt)
+                    .First())
+                .ToListAsync();
+
+            var lastByTable = lastCalls
+                .ToDictionary(c => c.WorkTableId, c => c);
+
+            // 4) Poskládáme viewmodely pro index
             Tables = tables
                 .Select(t =>
                 {
-                    var call = pendingCalls.FirstOrDefault(c => c.WorkTableId == t.Id);
+                    pendingByTable.TryGetValue(t.Id, out var pending);
+                    lastByTable.TryGetValue(t.Id, out var last);
+
                     return new TableOverviewViewModel
                     {
                         Table = t,
-                        PendingCall = call
+                        PendingCall = pending,
+                        LastCall = last
                     };
                 })
                 .ToList();

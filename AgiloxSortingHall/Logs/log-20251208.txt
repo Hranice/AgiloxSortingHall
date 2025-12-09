@@ -1,0 +1,172 @@
+2025-12-08 09:05:40.913 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 09:05:41.202 +01:00 [FTL] AgiloxSortingHall failed to start
+Microsoft.Extensions.Hosting.HostAbortedException: The host was aborted.
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.ThrowHostAborted()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.OnNext(KeyValuePair`2 value)
+   at System.Diagnostics.DiagnosticListener.Write(String name, Object value)
+   at System.Diagnostics.DiagnosticSource.Write[T](String name, T value)
+   at Microsoft.Extensions.Hosting.HostBuilder.ResolveHost(IServiceProvider serviceProvider, DiagnosticListener diagnosticListener)
+   at Microsoft.Extensions.Hosting.HostApplicationBuilder.Build()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.Build()
+   at Program.<Main>$(String[] args) in C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\Program.cs:line 54
+2025-12-08 09:05:52.134 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 09:05:52.318 +01:00 [FTL] AgiloxSortingHall failed to start
+Microsoft.Extensions.Hosting.HostAbortedException: The host was aborted.
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.ThrowHostAborted()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.OnNext(KeyValuePair`2 value)
+   at System.Diagnostics.DiagnosticListener.Write(String name, Object value)
+   at System.Diagnostics.DiagnosticSource.Write[T](String name, T value)
+   at Microsoft.Extensions.Hosting.HostBuilder.ResolveHost(IServiceProvider serviceProvider, DiagnosticListener diagnosticListener)
+   at Microsoft.Extensions.Hosting.HostApplicationBuilder.Build()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.Build()
+   at Program.<Main>$(String[] args) in C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\Program.cs:line 54
+2025-12-08 09:06:17.649 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 09:06:32.350 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 09:06:52.915 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582170000}
+2025-12-08 09:06:52.936 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582170000
+2025-12-08 09:07:08.363 +01:00 [INF] Agilox order 169956752582170000 pro stůl Stůl 1 byl zrušen.
+2025-12-08 09:07:28.217 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582170001}
+2025-12-08 09:07:28.219 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582170001
+2025-12-08 09:07:30.102 +01:00 [INF] Agilox order 169956752582170001 pro stůl Stůl 1 byl zrušen.
+2025-12-08 09:09:39.403 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 09:09:50.026 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 09:09:57.256 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 09:09:57.455 +01:00 [INF] Agilox odpověď pro řadu Řada4: {"status":"success","id":169956752582170002}
+2025-12-08 09:09:57.470 +01:00 [INF] Odeslán workflow 502 pro řadu Řada4 a stůl Stůl 1, OrderId=169956752582170002
+2025-12-08 09:10:03.043 +01:00 [INF] Agilox order 169956752582170002 pro stůl Stůl 1 byl zrušen.
+2025-12-08 09:36:46.017 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 09:36:54.224 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 09:36:54.455 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582170003}
+2025-12-08 09:36:54.470 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582170003
+2025-12-08 09:59:00.315 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 09:59:10.116 +01:00 [INF] Agilox order 169956752582170003 pro stůl Stůl 1 byl zrušen.
+2025-12-08 09:59:15.043 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=14124
+2025-12-08 09:59:15.068 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 09:59:15.241 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582170004}
+2025-12-08 09:59:15.248 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582170004
+2025-12-08 10:01:08.828 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 10:01:17.274 +01:00 [INF] Agilox order 169956752582170004 pro stůl Stůl 1 byl zrušen.
+2025-12-08 10:01:18.907 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=14124
+2025-12-08 10:01:18.936 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 10:01:19.108 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582180000}
+2025-12-08 10:01:19.119 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582180000
+2025-12-08 10:01:19.123 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 10:08:08.204 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 10:08:15.680 +01:00 [INF] Agilox order 169956752582180000 pro stůl Stůl 1 byl zrušen.
+2025-12-08 10:08:17.137 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=14124
+2025-12-08 10:08:17.163 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 10:08:17.306 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582180001}
+2025-12-08 10:08:17.315 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582180001
+2025-12-08 10:08:17.319 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 10:08:40.728 +01:00 [INF] Agilox order 169956752582180001 pro stůl Stůl 1 byl zrušen.
+2025-12-08 11:23:02.449 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 11:23:08.949 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=14124
+2025-12-08 11:23:08.977 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 11:23:09.180 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582190000}
+2025-12-08 11:23:09.193 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582190000
+2025-12-08 11:23:09.197 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:23:13.891 +01:00 [INF] Agilox order 169956752582190000 pro stůl Stůl 1 byl zrušen.
+2025-12-08 11:24:18.977 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 11:24:24.096 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=14124
+2025-12-08 11:24:24.161 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 11:24:24.363 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582190001}
+2025-12-08 11:24:24.376 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582190001
+2025-12-08 11:24:24.379 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:24:28.664 +01:00 [INF] Agilox order 169956752582190001 pro stůl Stůl 1 byl zrušen.
+2025-12-08 11:24:29.621 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=14124
+2025-12-08 11:24:29.648 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582190002}
+2025-12-08 11:24:29.651 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582190002
+2025-12-08 11:24:29.653 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:24:31.445 +01:00 [INF] Agilox order 169956752582190002 pro stůl Stůl 1 byl zrušen.
+2025-12-08 11:27:06.626 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 11:27:14.795 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=test
+2025-12-08 11:27:14.824 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 11:27:15.002 +01:00 [INF] Agilox odpověď pro řadu Řada4: {"status":"success","id":169956752582190003}
+2025-12-08 11:27:15.016 +01:00 [INF] Odeslán workflow 502 pro řadu Řada4 a stůl Stůl 1, OrderId=169956752582190003
+2025-12-08 11:27:15.021 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:27:24.032 +01:00 [INF] Agilox order 169956752582190003 pro stůl Stůl 1 byl zrušen.
+2025-12-08 11:27:46.707 +01:00 [INF] OnPostCallArticleAsync HIT: id=3, article=14124
+2025-12-08 11:27:46.745 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582190004}
+2025-12-08 11:27:46.749 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 3, OrderId=169956752582190004
+2025-12-08 11:27:46.750 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:27:48.726 +01:00 [INF] OnPostCallArticleAsync HIT: id=2, article=14124
+2025-12-08 11:27:48.754 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582190005}
+2025-12-08 11:27:48.757 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 2, OrderId=169956752582190005
+2025-12-08 11:27:48.759 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:27:50.090 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=14124
+2025-12-08 11:27:50.119 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582190006}
+2025-12-08 11:27:50.122 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582190006
+2025-12-08 11:27:50.124 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:27:52.940 +01:00 [INF] OnPostCallArticleAsync HIT: id=4, article=11
+2025-12-08 11:27:52.969 +01:00 [INF] Agilox odpověď pro řadu Řada3: {"status":"success","id":169956752582190007}
+2025-12-08 11:27:52.971 +01:00 [INF] Odeslán workflow 502 pro řadu Řada3 a stůl Stůl 4, OrderId=169956752582190007
+2025-12-08 11:27:52.972 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:27:54.977 +01:00 [INF] Agilox order 169956752582190004 pro stůl Stůl 3 byl zrušen.
+2025-12-08 11:27:56.049 +01:00 [INF] OnPostCallArticleAsync HIT: id=3, article=11
+2025-12-08 11:27:56.076 +01:00 [INF] Agilox odpověď pro řadu Řada3: {"status":"success","id":169956752582190008}
+2025-12-08 11:27:56.079 +01:00 [INF] Odeslán workflow 502 pro řadu Řada3 a stůl Stůl 3, OrderId=169956752582190008
+2025-12-08 11:27:56.081 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:27:57.839 +01:00 [INF] Agilox order 169956752582190005 pro stůl Stůl 2 byl zrušen.
+2025-12-08 11:27:58.581 +01:00 [INF] OnPostCallArticleAsync HIT: id=2, article=11
+2025-12-08 11:27:58.586 +01:00 [INF] Řada Řada3 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 11:27:58.587 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 11:27:59.676 +01:00 [INF] Agilox order 169956752582190006 pro stůl Stůl 1 byl zrušen.
+2025-12-08 11:28:00.262 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=11
+2025-12-08 11:28:00.268 +01:00 [INF] Řada Řada3 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 11:28:00.269 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 12:43:38.092 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 12:43:44.401 +01:00 [INF] OnPostCallArticleAsync HIT: id=2, article=14124
+2025-12-08 12:43:44.431 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 12:43:44.583 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"error","error":[{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@TABLE"},{"variable_missing":"@TABLE"}]}
+2025-12-08 12:43:44.589 +01:00 [WRN] Agilox odpověď pro řadu Řada5 neobsahuje platné 'id', OrderId zůstává null. Body: {"status":"error","error":[{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@TABLE"},{"variable_missing":"@TABLE"}]}
+2025-12-08 12:43:44.590 +01:00 [INF] Odeslán workflow 502 pro řadu Řada5 a stůl Stůl 2, OrderId=null
+2025-12-08 12:43:44.592 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 12:43:51.185 +01:00 [INF] Agilox order 169956752582190008 pro stůl Stůl 3 byl zrušen.
+2025-12-08 12:43:54.738 +01:00 [INF] Agilox order 169956752582190007 pro stůl Stůl 4 byl zrušen.
+2025-12-08 12:44:41.649 +01:00 [INF] Agilox odpověď pro řadu Řada3: {"status":"error","error":[{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@TABLE"},{"variable_missing":"@TABLE"}]}
+2025-12-08 12:44:41.653 +01:00 [WRN] Agilox odpověď neobsahuje použitelné 'id', řada Řada3, body: {"status":"error","error":[{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@TABLE"},{"variable_missing":"@TABLE"}]}
+2025-12-08 12:44:41.655 +01:00 [INF] Skladník – odeslán workflow 502 pro řadu Řada3 a stůl Stůl 1, OrderId=null
+2025-12-08 12:45:08.754 +01:00 [INF] OnPostCallArticleAsync HIT: id=4, article=13134
+2025-12-08 12:45:08.763 +01:00 [INF] Řada Řada6 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 12:45:08.764 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 12:45:12.201 +01:00 [INF] Agilox odpověď pro řadu Řada6: {"status":"error","error":[{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@TABLE"},{"variable_missing":"@TABLE"}]}
+2025-12-08 12:45:12.202 +01:00 [WRN] Agilox odpověď neobsahuje použitelné 'id', řada Řada6, body: {"status":"error","error":[{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@ROW"},{"variable_missing":"@TABLE"},{"variable_missing":"@TABLE"}]}
+2025-12-08 12:45:12.203 +01:00 [INF] Skladník – odeslán workflow 502 pro řadu Řada6 a stůl Stůl 4, OrderId=null
+2025-12-08 13:45:46.543 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 13:46:00.197 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 13:46:03.729 +01:00 [INF] Řada Řada5 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 13:46:05.959 +01:00 [INF] OnPostCallArticleAsync HIT: id=2, article=11
+2025-12-08 13:46:06.069 +01:00 [INF] Agilox odpověď pro řadu Řada3: {"status":"success","id":169956752582210011}
+2025-12-08 13:46:06.081 +01:00 [INF] Odeslán workflow 502 pro řadu Řada3 a stůl Stůl 1, OrderId=169956752582210011
+2025-12-08 13:46:06.084 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 13:46:08.422 +01:00 [INF] Agilox order 169956752582210011 pro stůl Stůl 1 byl zrušen.
+2025-12-08 13:46:08.426 +01:00 [INF] Řada Řada3 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 13:46:08.947 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-08 13:46:08.975 +01:00 [INF] Agilox odpověď pro řadu Řada6: {"status":"success","id":169956752582210012}
+2025-12-08 13:46:08.978 +01:00 [INF] Odeslán workflow 502 pro řadu Řada6 a stůl Stůl 1, OrderId=169956752582210012
+2025-12-08 13:46:08.979 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 13:46:10.366 +01:00 [INF] Řada Řada3 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 13:46:12.208 +01:00 [INF] Agilox order 169956752582210012 pro stůl Stůl 1 byl zrušen.
+2025-12-08 13:46:12.214 +01:00 [INF] Řada Řada6 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 13:46:18.105 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-08 13:46:18.135 +01:00 [INF] Agilox odpověď pro řadu Řada6: {"status":"success","id":169956752582210013}
+2025-12-08 13:46:18.137 +01:00 [INF] Odeslán workflow 502 pro řadu Řada6 a stůl Stůl 1, OrderId=169956752582210013
+2025-12-08 13:46:18.138 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 13:46:21.650 +01:00 [INF] OnPostCallArticleAsync HIT: id=2, article=13134
+2025-12-08 13:46:21.658 +01:00 [INF] Řada Řada6 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 13:46:21.660 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 13:46:28.784 +01:00 [INF] Agilox order 169956752582210013 pro stůl Stůl 1 byl zrušen.
+2025-12-08 13:46:28.787 +01:00 [INF] Řada Řada6 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 14:09:55.121 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-08 14:10:04.171 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-08 14:10:13.826 +01:00 [INF] OnPostCallArticleAsync HIT: id=2, article=13134
+2025-12-08 14:10:13.946 +01:00 [INF] Agilox odpověď pro řadu Řada6: {"status":"success","id":169956752582220000}
+2025-12-08 14:10:13.962 +01:00 [INF] Odeslán workflow 502 pro řadu Řada6 a stůl Stůl 2, OrderId=169956752582220000
+2025-12-08 14:10:13.965 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 14:10:16.714 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-08 14:10:16.731 +01:00 [INF] Řada Řada6 nemá volnou paletu – workflow se zatím nespouští.
+2025-12-08 14:10:16.733 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-08 14:10:22.896 +01:00 [INF] Agilox order 169956752582220000 pro stůl Stůl 2 byl zrušen.
+2025-12-08 14:10:22.920 +01:00 [INF] Agilox odpověď pro řadu Řada6: {"status":"success","id":169956752582220001}
+2025-12-08 14:10:22.922 +01:00 [INF] Odeslán workflow 502 pro řadu Řada6 a stůl Stůl 1, OrderId=169956752582220001
+2025-12-08 14:10:28.547 +01:00 [INF] Agilox order 169956752582220001 pro stůl Stůl 1 byl zrušen.

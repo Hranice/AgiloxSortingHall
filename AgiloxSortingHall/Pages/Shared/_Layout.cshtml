@@ -31,10 +31,19 @@
             .withAutomaticReconnect()
             .build();
 
-        // Když server řekne "HallUpdated", reload stránky
-        connection.on("HallUpdated", () => {
-            location.reload();
+               connection.on("HallUpdated", () => {
+            const path = window.location.pathname.toLowerCase();
+
+            // Reload jen na hlavní přehled + případně skladníka
+            if (path === "/" ||
+                path === "/index" ||
+                path === "/index/" ||
+                path.startsWith("/skladnik"))
+            {
+                location.reload();
+            }
         });
+
 
         connection.start().catch(err => console.error(err.toString()));
     </script>

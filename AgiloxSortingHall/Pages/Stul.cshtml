@@ -1,13 +1,11 @@
 ﻿@page "{id:int}"
 @using AgiloxSortingHall.Models
 @using AgiloxSortingHall.ViewModels
-@model StulModel
+@using AgiloxSortingHall.Helpers
+@model AgiloxSortingHall.Pages.StulModel
 
 @{
-    // Nastavení titulku stránky podle jména aktuálního stolu
     ViewData["Title"] = Model.Table.Name;
-
-    // Zjištění maximální kapacity mezi všemi řadami – slouží pro CSS grid layout
     var maxCapacity = Model.Rows.Max(r => r.Capacity);
     var columnCount = Model.Rows.Count;
 }
@@ -27,114 +25,100 @@
         </a>
     </div>
 
-       
+    @* Pokud má stůl aktivní pending call, zobrazíme čekací obrazovku *@
+    @if (Model.PendingCall != null)
+    {
+        var call = Model.PendingCall;
+        var rowName = call.HallRow?.Name ?? "(neznámá řada)";
+        var article = call.HallRow?.Article;
+        var activityVm = AgiloxActivityDescriptionHelper.GetActivityUi(call);
+        var waitingForWarehouse = call.OrderId == null;
 
-        @* Pokud má stůl aktivní pending call, zobrazíme čekací obrazovku *@
-        @if (Model.PendingCall != null)
-        {
-            var call = Model.PendingCall;
-            var rowName = call.HallRow?.Name ?? "(neznámá řada)";
-            var article = call.HallRow?.Article;
-            var activity = call != null ? Model.GetActivityDescription(call) : null;
+        <div class="hall-wait d-flex flex-column justify-content-center align-items-center text-light">
+            <div class="text-center mb-4">
 
-            <div class="hall-wait d-flex flex-column justify-content-center align-items-center text-light">
-                <div class="text-center mb-4">
+                <!-- Nadpis sekce čekání -->
+                <h2 class="mb-3 fs-1">
+                    @(waitingForWarehouse ? "Čeká na doplnění palety" : "Čeká na doručení palety")
+                </h2>
 
-                    <!-- Nadpis sekce čekání -->
-                    <h2 class="mb-3 fs-1">Čeká na doručení</h2>
+                <!-- Zobrazení základních informací o callu -->
+                <p class="fs-4 mb-1">
+                    Řada: <strong>@rowName</strong>
+                </p>
 
-                    <!-- Zobrazení základních informací o callu -->
-                    <p class="fs-4 mb-1">
-                        Řada: <strong>@rowName</strong>
+                @if (!string.IsNullOrWhiteSpace(article))
+                {
+                    <p class="fs-4">
+                        Artikl: <strong>@article</strong>
                     </p>
+                }
 
-                    @* Pokud je dostupný artikl, zobrazíme i jeho identifikaci *@
-                    @if (!string.IsNullOrWhiteSpace(article))
-                    {
-                        <p class="fs-4">
-                            Artikl: <strong>@article</strong>
-                        </p>
-                    }
-
-                    @* Rozlišení dvou stavů: čekáme buď na skladníka, nebo už jede Agilox *@
-                    @if (call.OrderId == null)
-                    {
-                        <p class="fs-5 text-secondary mt-3">
-                            Čeká se na doplnění palety skladníkem…
-                        </p>
-                    }
-                    else
-                    {
-                        <p class="fs-5 text-secondary mt-3">
-                            @activity
-                        </p>
-                        <p class="fs-6 mt-2">
-                            Agilox order ID:
-                            <code class="text-info">@call.OrderId</code>
-                        </p>
-                    }
-                </div>
-
-                <!-- Tlačítko pro zrušení požadavku -->
-                <div class="d-flex flex-column gap-3 w-100" style="max-width: 400px;">
-                    <form method="post" asp-page-handler="CancelCall">
-                        <button type="submit"
-                                class="btn btn-outline-danger btn-lg w-100 py-3">
-                            ✖ Zrušit požadavek
-                        </button>
-                    </form>
-                </div>
+                @if (waitingForWarehouse)
+                {
+                    <p class="fs-5 text-warning mt-3">
+                        <i class="bi bi-box-seam me-2"></i>
+                        @activityVm.Text
+                    </p>
+                }
+                else
+                {
+                    <p class="fs-5 mt-3 @activityVm.TextCss">
+                        <i class="bi @activityVm.IconCss me-2"></i>
+                        @activityVm.Text
+                    </p>
+                    <p class="fs-6 mt-2">
+                        Agilox order ID:
+                        <code class="text-info">@call.OrderId</code>
+                    </p>
+                }
             </div>
-        }
 
-        else
-        {
-            @* Pokud žádný pending call neexistuje, zobrazí se obsah podle zvoleného režimu *@
-
-            @if (Model.ViewMode == "rows")
-            {
-                <div class="hall-columns-container">
-                    @foreach (var row in Model.Rows)
-                    {
-                        <form method="post"
-                              asp-page-handler="CallRow"
-                          class="hall-column">
-
-                            <input type="hidden" name="id" value="@Model.Table.Id" />
-                            <input type="hidden" name="rowId" value="@row.Id" />
-
-                            <button type="submit" class="btn btn-outline-primary column-button w-100 p-2">
-                                @await Html.PartialAsync(
-                                "_HallColumnVisual",
-                                        new HallColumnViewModel
-                                        {
-                                            Row = row,
-                                            MaxCapacity = maxCapacity,
-                                            PendingCalls = Model.PendingCalls,
-                                            CurrentTableId = Model.Table.Id
-                                        })
-                </button>
-            </form>
-                        }
-                </div>
-            }
-            else if (Model.ViewMode == "articles")
-            {
-                @await Html.PartialAsync("_StulArticleList", Model)
-            }
-        }
-
-
-    <div id="loading-overlay" class="loading-overlay d-none">
-        <div class="loading-inner text-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Probíhá komunikace s Agiloxem…</span>
-            </div>
-            <div class="mt-3 fs-3">
-                Odesílám požadavek na Agilox…
+            <!-- Tlačítko pro zrušení požadavku -->
+            <div class="d-flex flex-column gap-3 w-100" style="max-width: 400px;">
+                <form method="post" asp-page-handler="CancelCall">
+                    <button type="submit"
+                            class="btn btn-outline-danger btn-lg w-100 py-3">
+                        ✖ Zrušit požadavek
+                    </button>
+                </form>
             </div>
         </div>
-    </div>
+    }
+    else
+    {
+        @* Pokud žádný pending call neexistuje, zobrazí se obsah podle zvoleného režimu *@
 
+        @if (Model.ViewMode == "rows")
+        {
+            <div class="hall-columns-container">
+                @foreach (var row in Model.Rows)
+                {
+                    <form method="post"
+                          asp-page-handler="CallRow"
+                          class="hall-column">
 
-    </div>
+                        <input type="hidden" name="id" value="@Model.Table.Id" />
+                        <input type="hidden" name="rowId" value="@row.Id" />
+
+                        <button type="submit" class="btn btn-outline-primary column-button w-100 p-2">
+                            @await Html.PartialAsync(
+                            "_HallColumnVisual",
+                                new HallColumnViewModel
+                                {
+                                    Row = row,
+                                    MaxCapacity = maxCapacity,
+                                    PendingCalls = Model.PendingCalls,
+                                    CurrentTableId = Model.Table.Id
+                                })
+            </button>
+        </form>
+                }
+            </div>
+        }
+        else if (Model.ViewMode == "articles")
+        {
+            @await Html.PartialAsync("_StulArticleList", Model)
+        }
+    }
+</div>
