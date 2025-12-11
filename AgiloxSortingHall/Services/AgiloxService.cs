@@ -31,6 +31,9 @@ namespace AgiloxSortingHall.Services
         /// Vstupní bod pro zpracování callbacku od Agiloxu.
         /// Podle <see cref="AgiloxCallbackDto.Action"/> a <see cref="AgiloxCallbackDto.Status"/>
         /// přepne na odpovídající obslužnou rutinu (pickup, drop, order_canceled).
+        /// Umí zpracovat jak klasické "řada → stůl" cally (s HallRow),
+        /// tak i "table-only" cally (např. workflow po stisku tlačítka HOTOVO),
+        /// kde je <see cref="RowCall.HallRowId"/> null.
         /// </summary>
         /// <param name="dto">
         /// Data z callbacku obsahující OrderId, Action, Status a případně Row/Table název.
@@ -41,7 +44,7 @@ namespace AgiloxSortingHall.Services
                 "Processing Agilox callback: orderid={OrderId}, action={Action}, row={Row}, table={Table}, status={Status}",
                 dto.OrderId, dto.Action, dto.Row, dto.Table, dto.Status);
 
-            // Převedeme string hodnoty na enumy – budeme s nimi dál pracovat typově bezpečně.
+            // Převedeme string hodnoty na enumy – dál pracujeme typově bezpečně.
             var action = ParseAction(dto.Action);
             var status = ParseStatus(dto.Status);
 
@@ -67,14 +70,62 @@ namespace AgiloxSortingHall.Services
             call.LastAgiloxStatus = dto.Status;
 
             // sanity check na jméno řady / stolu – neblokuje zpracování, jen loguje.
-            LogRowTableMismatchIfAny(call, dto);
+            if (call.HallRow != null)
+            {
+                LogRowTableMismatchIfAny(call, dto);
+            }
+            else
+            {
+                // "table-only" RowCall – kontrolujeme jen stůl
+                var tableMatches = string.Equals(call.WorkTable.Name, dto.Table, StringComparison.OrdinalIgnoreCase);
+                if (!tableMatches)
+                {
+                    _logger.LogWarning(
+                        "Agilox callback table mismatch for table-only RowCall. Call has table={TableDb}, callback table={TableDto}, orderid={OrderId}.",
+                        call.WorkTable.Name, dto.Table, dto.OrderId);
+                }
+            }
 
-            // 1) Speciální case – order_canceled (nezávisle na action).
+            // Pokud je RowCall bez HallRow (např. workflow po stisku HOTOVO),
+            // nešaháme na sloty v řadách – jen udržujeme stav v RowCallu.
+            if (call.HallRow == null)
+            {
+                if (status == AgiloxStatus.OrderCanceled)
+                {
+                    // stále chceme, aby "order_canceled" zrušil i tento RowCall
+                    HandleOrderCanceled(call, dto);
+                }
+                else if (action == AgiloxAction.Pickup && status == AgiloxStatus.Ok)
+                {
+                    // Agilox úspěšně nabral paletu ze stolu -> stůl je volný
+                    call.Status = RowCallStatus.Delivered;
+
+                    _logger.LogInformation(
+                        "Table-only pickup OK for RowCall {RowCallId} (OrderId={OrderId}, Table={Table}). " +
+                        "Table is now considered free (Delivered).",
+                        call.Id, dto.OrderId, call.WorkTable.Name);
+                }
+                else
+                {
+                    // ostatní stavy jen logujeme, UI je uvidí přes LastAgiloxStatus/Action
+                    _logger.LogInformation(
+                        "Agilox callback for table-only RowCall {RowCallId} (OrderId={OrderId}, Table={Table}) – Action={Action}, Status={Status}. " +
+                        "No HallRow attached, row slots are not updated.",
+                        call.Id, dto.OrderId, call.WorkTable.Name, action, status);
+                }
+
+                await _db.SaveChangesAsync();
+                await _hub.Clients.All.SendAsync("HallUpdated");
+                return;
+            }
+
+            // klasický RowCall s HallRow (řada -> stůl)
+
+            // Speciální case – order_canceled (nezávisle na action).
             if (status == AgiloxStatus.OrderCanceled)
             {
                 HandleOrderCanceled(call, dto);
             }
-            // 2) Pickup/drop podle action.
             else if (action == AgiloxAction.Pickup)
             {
                 HandlePickup(call, status, dto);
@@ -94,6 +145,9 @@ namespace AgiloxSortingHall.Services
             await _db.SaveChangesAsync();
             await _hub.Clients.All.SendAsync("HallUpdated");
         }
+
+
+
 
         #region Handlery pro jednotlivé typy callbacků
 

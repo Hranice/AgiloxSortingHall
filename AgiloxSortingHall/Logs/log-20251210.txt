@@ -1,0 +1,89 @@
+2025-12-10 10:10:59.450 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 10:11:01.193 +01:00 [FTL] AgiloxSortingHall failed to start
+System.InvalidOperationException: An error was generated for warning 'Microsoft.EntityFrameworkCore.Migrations.PendingModelChangesWarning': The model for context 'AppDbContext' has pending changes. Add a new migration before updating the database. See https://aka.ms/efcore-docs-pending-changes. This exception can be suppressed or logged by passing event ID 'RelationalEventId.PendingModelChangesWarning' to the 'ConfigureWarnings' method in 'DbContext.OnConfiguring' or 'AddDbContext'.
+   at Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`1.Log[TLoggerCategory](IDiagnosticsLogger`1 logger, TParam arg)
+   at Microsoft.EntityFrameworkCore.Diagnostics.RelationalLoggerExtensions.PendingModelChangesWarning(IDiagnosticsLogger`1 diagnostics, Type contextType)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.ValidateMigrations(Boolean useTransaction, String targetMigration)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.Migrate(DatabaseFacade databaseFacade)
+   at Program.<Main>$(String[] args) in C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\Program.cs:line 60
+2025-12-10 10:11:06.159 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 10:11:07.592 +01:00 [FTL] AgiloxSortingHall failed to start
+System.InvalidOperationException: An error was generated for warning 'Microsoft.EntityFrameworkCore.Migrations.PendingModelChangesWarning': The model for context 'AppDbContext' has pending changes. Add a new migration before updating the database. See https://aka.ms/efcore-docs-pending-changes. This exception can be suppressed or logged by passing event ID 'RelationalEventId.PendingModelChangesWarning' to the 'ConfigureWarnings' method in 'DbContext.OnConfiguring' or 'AddDbContext'.
+   at Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`1.Log[TLoggerCategory](IDiagnosticsLogger`1 logger, TParam arg)
+   at Microsoft.EntityFrameworkCore.Diagnostics.RelationalLoggerExtensions.PendingModelChangesWarning(IDiagnosticsLogger`1 diagnostics, Type contextType)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.ValidateMigrations(Boolean useTransaction, String targetMigration)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.Migrate(DatabaseFacade databaseFacade)
+   at Program.<Main>$(String[] args) in C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\Program.cs:line 60
+2025-12-10 10:11:34.519 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 10:11:36.112 +01:00 [FTL] AgiloxSortingHall failed to start
+System.InvalidOperationException: An error was generated for warning 'Microsoft.EntityFrameworkCore.Migrations.PendingModelChangesWarning': The model for context 'AppDbContext' has pending changes. Add a new migration before updating the database. See https://aka.ms/efcore-docs-pending-changes. This exception can be suppressed or logged by passing event ID 'RelationalEventId.PendingModelChangesWarning' to the 'ConfigureWarnings' method in 'DbContext.OnConfiguring' or 'AddDbContext'.
+   at Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`1.Log[TLoggerCategory](IDiagnosticsLogger`1 logger, TParam arg)
+   at Microsoft.EntityFrameworkCore.Diagnostics.RelationalLoggerExtensions.PendingModelChangesWarning(IDiagnosticsLogger`1 diagnostics, Type contextType)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.ValidateMigrations(Boolean useTransaction, String targetMigration)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.Migrate(DatabaseFacade databaseFacade)
+   at Program.<Main>$(String[] args) in C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\Program.cs:line 60
+2025-12-10 10:12:05.616 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 10:12:05.778 +01:00 [FTL] AgiloxSortingHall failed to start
+Microsoft.Extensions.Hosting.HostAbortedException: The host was aborted.
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.ThrowHostAborted()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.OnNext(KeyValuePair`2 value)
+   at System.Diagnostics.DiagnosticListener.Write(String name, Object value)
+   at System.Diagnostics.DiagnosticSource.Write[T](String name, T value)
+   at Microsoft.Extensions.Hosting.HostBuilder.ResolveHost(IServiceProvider serviceProvider, DiagnosticListener diagnosticListener)
+   at Microsoft.Extensions.Hosting.HostApplicationBuilder.Build()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.Build()
+   at Program.<Main>$(String[] args) in C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\Program.cs:line 54
+2025-12-10 10:12:15.505 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 10:12:15.667 +01:00 [FTL] AgiloxSortingHall failed to start
+Microsoft.Extensions.Hosting.HostAbortedException: The host was aborted.
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.ThrowHostAborted()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.OnNext(KeyValuePair`2 value)
+   at System.Diagnostics.DiagnosticListener.Write(String name, Object value)
+   at System.Diagnostics.DiagnosticSource.Write[T](String name, T value)
+   at Microsoft.Extensions.Hosting.HostBuilder.ResolveHost(IServiceProvider serviceProvider, DiagnosticListener diagnosticListener)
+   at Microsoft.Extensions.Hosting.HostApplicationBuilder.Build()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.Build()
+   at Program.<Main>$(String[] args) in C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\Program.cs:line 54
+2025-12-10 10:12:19.798 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 10:12:27.687 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-10 10:12:41.735 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-10 10:12:41.896 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582660000}
+2025-12-10 10:12:41.915 +01:00 [INF] Odeslán workflow 501 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582660000
+2025-12-10 10:12:41.918 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-10 10:12:44.689 +01:00 [INF] Agilox order 169956752582660000 pro stůl Stůl 1 byl zrušen.
+2025-12-10 10:12:47.050 +01:00 [INF] OnPostDoneAsync: posílám workflow 502 pro stůl Stůl 1. Payload={"@TABLE":"St\u016Fl 1"}
+2025-12-10 10:12:47.072 +01:00 [INF] OnPostDoneAsync: Agilox odpověď pro stůl Stůl 1: {"status":"success","id":169956752582660001}
+2025-12-10 10:12:47.076 +01:00 [INF] OnPostDoneAsync: RowCall 2 pro stůl Stůl 1 má OrderId=169956752582660001
+2025-12-10 10:13:03.519 +01:00 [INF] Agilox order 169956752582660001 pro stůl Stůl 1 byl zrušen.
+2025-12-10 10:13:03.527 +01:00 [INF] TryDispatchAgiloxForRowAsync: hallRowId == null -> žádná řada, nic se nespouští.
+2025-12-10 10:13:08.467 +01:00 [INF] OnPostDoneAsync: posílám workflow 502 pro stůl Stůl 1. Payload={"@TABLE":"St\u016Fl 1"}
+2025-12-10 10:13:08.493 +01:00 [INF] OnPostDoneAsync: Agilox odpověď pro stůl Stůl 1: {"status":"success","id":169956752582660002}
+2025-12-10 10:13:08.496 +01:00 [INF] OnPostDoneAsync: RowCall 3 pro stůl Stůl 1 má OrderId=169956752582660002
+2025-12-10 10:19:39.022 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 10:19:54.618 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-10 10:19:54.647 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-10 10:19:54.817 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582660003}
+2025-12-10 10:19:54.836 +01:00 [INF] Odeslán workflow 501 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582660003
+2025-12-10 10:19:54.841 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-10 10:19:58.726 +01:00 [INF] Agilox order 169956752582660003 pro stůl Stůl 1 byl zrušen.
+2025-12-10 10:20:04.804 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-10 10:20:04.836 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752582660004}
+2025-12-10 10:20:04.841 +01:00 [INF] Odeslán workflow 501 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752582660004
+2025-12-10 10:20:04.844 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-10 10:20:07.015 +01:00 [INF] Agilox order 169956752582660004 pro stůl Stůl 1 byl zrušen.
+2025-12-10 10:20:34.963 +01:00 [INF] OnPostCallArticleAsync HIT: id=2, article=14124
+2025-12-10 10:20:34.988 +01:00 [INF] Agilox odpověď pro řadu Řada4: {"status":"success","id":169956752582660005}
+2025-12-10 10:20:34.990 +01:00 [INF] Odeslán workflow 501 pro řadu Řada4 a stůl Stůl 2, OrderId=169956752582660005
+2025-12-10 10:20:34.992 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-10 11:25:30.787 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-10 11:29:49.517 +01:00 [INF] Agilox order 169956752582660002 pro stůl Stůl 1 byl zrušen.
+2025-12-10 11:29:49.575 +01:00 [INF] TryDispatchAgiloxForRowAsync: hallRowId == null -> žádná řada, nic se nespouští.
+2025-12-10 11:29:52.371 +01:00 [INF] OnPostDoneAsync: posílám workflow 502 pro stůl Stůl 1. Payload={"@TABLE":"St\u016Fl 1"}
+2025-12-10 11:29:52.397 +01:00 [INF] OnPostDoneAsync: Agilox odpověď pro stůl Stůl 1: {"status":"success","id":169956752582670000}
+2025-12-10 11:29:52.403 +01:00 [INF] OnPostDoneAsync: RowCall 7 pro stůl Stůl 1 má OrderId=169956752582670000
+2025-12-10 11:29:54.202 +01:00 [INF] Agilox order 169956752582670000 pro stůl Stůl 1 byl zrušen.
+2025-12-10 11:29:54.205 +01:00 [INF] TryDispatchAgiloxForRowAsync: hallRowId == null -> žádná řada, nic se nespouští.
+2025-12-10 11:29:56.985 +01:00 [INF] Agilox order 169956752582660005 pro stůl Stůl 2 byl zrušen.

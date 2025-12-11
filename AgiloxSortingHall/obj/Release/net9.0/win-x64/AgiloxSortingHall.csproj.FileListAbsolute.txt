@@ -530,4 +530,4 @@ C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Sinks.Console.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Sinks.Debug.dll
 C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\win-x64\Serilog.Sinks.File.dll
-C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\exdf17do33-{0}-8y7ocy8bve-8y7ocy8bve.gz
+C:\Users\jprochazka\source\repos\AgiloxSortingHall\AgiloxSortingHall\obj\Release\net9.0\win-x64\compressed\exdf17do33-{0}-gztni8g0zy-gztni8g0zy.gz

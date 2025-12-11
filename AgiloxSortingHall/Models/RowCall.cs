@@ -3,9 +3,10 @@
 namespace AgiloxSortingHall.Models
 {
     /// <summary>
-    /// Reprezentuje požadavek pracovního stolu na paletu z konkrétní řady.
-    /// Uchovává metadata o tom, kdy byl vytvořen, jeho aktuální stav
-    /// a referenci na objednávku odeslanou do systému Agilox.
+    /// Reprezentuje požadavek pracovního stolu.
+    /// Buď:
+    /// - "řada -> stůl" (HallRowId vyplněné)
+    /// - nebo "stůl -> pryč" (např. dokončení / odvoz od stolu, HallRowId může být null).
     /// </summary>
     public class RowCall
     {
@@ -15,61 +16,53 @@ namespace AgiloxSortingHall.Models
         public int Id { get; set; }
 
         /// <summary>
-        /// ID pracovního stolu, který požadavek vytvořil.
+        /// ID stolu, který vyvolal požadavek.
         /// </summary>
         public int WorkTableId { get; set; }
 
         /// <summary>
-        /// Navigační vlastnost na pracovní stůl,
-        /// ze kterého byl požadavek odeslán.
+        /// Navigační vlastnost na stůl, který požadavek vytvořil.
         /// </summary>
         public WorkTable WorkTable { get; set; } = null!;
 
         /// <summary>
-        /// ID řady, ze které má být naložena paleta.
+        /// ID řady, ze které se má paleta odebrat.
+        /// Pro "normální" call řada->stůl je vyplněné,
+        /// pro "Hotovo" (odvoz od stolu) může být null.
         /// </summary>
-        public int HallRowId { get; set; }
+        public int? HallRowId { get; set; }
 
         /// <summary>
-        /// Navigační vlastnost na řadu, odkud má být paleta odebrána.
+        /// Navigační vlastnost na řadu.
+        /// Může být null u požadavků typu "stůl -> pryč".
         /// </summary>
-        public HallRow HallRow { get; set; } = null!;
+        public HallRow? HallRow { get; set; }
 
         /// <summary>
         /// Datum a čas vytvoření požadavku (UTC).
-        /// Pomáhá seřadit čekající požadavky a zobrazovat je v UI.
         /// </summary>
         public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// Stav požadavku — čeká, doručeno nebo zrušeno.
-        /// Odráží aktuální výsledek zpracování workflow na straně Agiloxu.
+        /// Aktuální stav požadavku (čeká, doručeno, zrušeno).
         /// </summary>
         public RowCallStatus Status { get; set; } = RowCallStatus.Pending;
 
         /// <summary>
-        /// Identifikátor objednávky (workflow ID) vygenerovaný systémem Agilox.
-        /// Tento identifikátor používáme ke spárování callbacků s konkrétním požadavkem.
-        /// Pokud je <c>null</c>, požadavek ještě nebyl odeslán do Agiloxu.
+        /// Identifikátor order vráceného od Agiloxe,
+        /// sloužící ke spárování s callbackem
+        /// (generován Agiloxem po odeslání požadavku).
         /// </summary>
-        public long? OrderId { get; set; } = null!;
+        public long? OrderId { get; set; }
 
         /// <summary>
-        /// Poslední akce (action) zaslaná v Agilox callbacku
-        /// (např. <c>pickup</c> nebo <c>drop</c>).
-        /// Tato informace doplňuje <see cref="LastAgiloxStatus"/>,
-        /// protože status <c>ok</c> může znamenat různé situace podle typu akce.
-        /// Díky tomu dokážeme jednoznačně určit, zda bylo workflow v kroku naložení,
-        /// nebo vyložení palety.
-        /// </summary>
-        public string? LastAgiloxAction { get; set; }
-
-        /// <summary>
-        /// Poslední status zaslaný z Agiloxu v callbacku
-        /// (např. <c>ok</c>, <c>pallet_not_found</c>, <c>occupied</c>, <c>order_canceled</c>).
-        /// Ukládá se přesně tak, jak přišel v JSON payloadu, pro účely zobrazení,
-        /// diagnostiky a historického auditu.
+        /// Poslední status, který Agilox poslal v callbacku (AgiloxStatus).
         /// </summary>
         public string? LastAgiloxStatus { get; set; }
+
+        /// <summary>
+        /// Poslední akce, kterou Agilox nahlásil v callbacku (AgiloxAction).
+        /// </summary>
+        public string? LastAgiloxAction { get; set; }
     }
 }

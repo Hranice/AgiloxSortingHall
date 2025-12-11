@@ -67,7 +67,7 @@ namespace AgiloxSortingHall.Helpers
                 case AgiloxStatus.PalletNotFound:
                     return new AgiloxActivityViewModel
                     {
-                        Text = "Paleta nebyla nalezena v řadě",
+                        Text = "Paleta nebyla nalezena",
                         Severity = AgiloxSeverity.Error,
                         IconCss = "bi-exclamation-octagon-fill",
                         TextCss = "text-danger"

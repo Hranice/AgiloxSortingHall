@@ -111,6 +111,18 @@ namespace AgiloxSortingHall.Pages
                 return RedirectToPage();
             }
 
+            // vytvoøíme RowCall bez øady – reprezentuje "odvoz od stolu"
+            var call = new RowCall
+            {
+                WorkTableId = table.Id,
+                HallRowId = null,
+                Status = RowCallStatus.Pending,
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _db.RowCalls.Add(call);
+            await _db.SaveChangesAsync();
+
             var client = _httpClientFactory.CreateClient("Agilox");
 
             var payload = new Dictionary<string, string>
@@ -122,7 +134,7 @@ namespace AgiloxSortingHall.Pages
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             _logger.LogInformation(
-                "OnPostDoneAsync: posílám workflow 502 (DONE) pro stùl {Table}. Payload={Payload}",
+                "OnPostDoneAsync: posílám workflow 502 pro stùl {Table}. Payload={Payload}",
                 table.Name,
                 json);
 
@@ -130,15 +142,58 @@ namespace AgiloxSortingHall.Pages
             var responseBody = await response.Content.ReadAsStringAsync();
 
             _logger.LogInformation(
-                "OnPostDoneAsync: Agilox odpovìï pro DONE stùl {Table}: {Body}",
+                "OnPostDoneAsync: Agilox odpovìï pro stùl {Table}: {Body}",
                 table.Name,
                 responseBody);
 
             response.EnsureSuccessStatusCode();
 
-            // žádný stav v DB nemìníme – pøípadný callback zpracuje AgiloxService
+            // zkus vytáhnout ID z odpovìdi Agiloxu a uložit do RowCall.OrderId
+            try
+            {
+                using var doc = JsonDocument.Parse(responseBody);
+
+                if (doc.RootElement.TryGetProperty("id", out var idProp))
+                {
+                    long? agiloxId = null;
+
+                    if (idProp.ValueKind == JsonValueKind.Number &&
+                        idProp.TryGetInt64(out var numericId))
+                    {
+                        agiloxId = numericId;
+                    }
+                    else if (idProp.ValueKind == JsonValueKind.String &&
+                             long.TryParse(idProp.GetString(), out var stringId))
+                    {
+                        agiloxId = stringId;
+                    }
+
+                    if (agiloxId.HasValue)
+                    {
+                        call.OrderId = agiloxId.Value;
+                        await _db.SaveChangesAsync();
+                        _logger.LogInformation(
+                            "OnPostDoneAsync: RowCall {RowCallId} pro stùl {Table} má OrderId={OrderId}",
+                            call.Id, table.Name, call.OrderId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "OnPostDoneAsync: odpovìï Agiloxu neobsahuje použitelné 'id'. Body={Body}",
+                            responseBody);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "OnPostDoneAsync: chyba pøi parsování odpovìdi Agiloxu: {Body}",
+                    responseBody);
+            }
+
             return RedirectToPage();
         }
+
 
     }
 }
