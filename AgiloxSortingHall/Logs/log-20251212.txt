@@ -1,0 +1,21 @@
+2025-12-12 12:37:31.169 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-12 12:37:40.079 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-12 12:37:40.108 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-12 12:37:40.294 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752583160000}
+2025-12-12 12:37:40.310 +01:00 [INF] Odeslán workflow 501 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752583160000
+2025-12-12 12:37:40.314 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-12 12:37:41.678 +01:00 [INF] Agilox order 169956752583160000 pro stůl Stůl 1 byl zrušen.
+2025-12-12 12:55:47.943 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-12 12:55:56.698 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-12 12:55:56.731 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-12 12:55:56.916 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752583160001}
+2025-12-12 12:55:56.930 +01:00 [INF] Odeslán workflow 501 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752583160001
+2025-12-12 12:55:56.934 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-12 12:55:58.858 +01:00 [INF] Agilox order 169956752583160001 pro stůl Stůl 1 byl zrušen.
+2025-12-12 12:56:22.549 +01:00 [INF] Starting AgiloxSortingHall application...
+2025-12-12 12:56:30.926 +01:00 [INF] OnPostCallArticleAsync HIT: id=1, article=13134
+2025-12-12 12:56:30.951 +01:00 [WRN] The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+2025-12-12 12:56:31.096 +01:00 [INF] Agilox odpověď pro řadu Řada5: {"status":"success","id":169956752583160002}
+2025-12-12 12:56:31.107 +01:00 [INF] Odeslán workflow 501 pro řadu Řada5 a stůl Stůl 1, OrderId=169956752583160002
+2025-12-12 12:56:31.111 +01:00 [INF] OnPostCallArticleAsync finished OK, redirecting to Index
+2025-12-12 12:56:35.129 +01:00 [INF] Agilox order 169956752583160002 pro stůl Stůl 1 byl zrušen.

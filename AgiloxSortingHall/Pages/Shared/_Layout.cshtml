@@ -26,12 +26,21 @@
             crossorigin="anonymous"></script>
 
     <script>
+                document.addEventListener("submit", function () {
+            window.isNavigating = true;
+        });
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/hallHub")
             .withAutomaticReconnect()
             .build();
 
                connection.on("HallUpdated", () => {
+                        if (window.isNavigating) {
+            console.debug("HallUpdated ignored – navigation in progress");
+            return;
+        }
+
             const path = window.location.pathname.toLowerCase();
 
             // Reload jen na hlavní přehled + případně skladníka
