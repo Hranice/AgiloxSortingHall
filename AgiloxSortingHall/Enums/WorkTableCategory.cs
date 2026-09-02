@@ -12,6 +12,7 @@
         Pracoviste6 = 7,
         Pracoviste7 = 8,
         //Pracoviste8 = 9,
-        //Pracoviste9 = 10
+        //Pracoviste9 = 10,
+        Kontrola2 = 11
     }
 }

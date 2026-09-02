@@ -17,6 +17,7 @@ namespace AgiloxSortingHall.Helpers
             WorkTableCategory.Pracoviste7 => "Pracoviště 7",
             //WorkTableCategory.Pracoviste8 => "Pracoviště 8",
             //WorkTableCategory.Pracoviste9 => "Pracoviště 9",
+            WorkTableCategory.Kontrola2 => "Kontrola 2",
             _ => c.ToString()
         };
     }

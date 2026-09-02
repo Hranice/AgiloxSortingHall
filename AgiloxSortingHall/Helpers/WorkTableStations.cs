@@ -15,9 +15,19 @@ namespace AgiloxSortingHall.Helpers
         public static string GetUiName(WorkTable t)
             => t.DisplayName;
 
+        // Kontrola --> hotovo
+        /*
         public static string GetDestination(WorkTable t)
             => t.Category != WorkTableCategory.Kontrola ? "Kontrola" : "Hotovo";
+        */
 
+        // Kontrola --> Kontrola2 --> hotovo
+        public static string GetDestination(WorkTable t) => t.Category switch
+        {
+            WorkTableCategory.Kontrola => "Kontrola2",
+            WorkTableCategory.Kontrola2 => "Hotovo",
+            _ => "Kontrola"
+        };
         public static bool MatchesStation(WorkTable t, string? station)
         {
             if (string.IsNullOrWhiteSpace(station)) return false;

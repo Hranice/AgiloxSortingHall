@@ -556,28 +556,30 @@ public class SkladnikSettingsModel : PageModel
     /// - pøi sníení nesmí "odøíznout" obsazené sloty
     /// - pøi zvıšení doplní chybìjící sloty
     /// </summary>
-    private async Task<bool> ApplyCapacityChangeAsync(HallRow row, int newCapacity)
+    private Task<bool> ApplyCapacityChangeAsync(HallRow row, int newCapacity)
     {
-        var oldCapacity = row.Capacity;
+        // Pùvodní implementace byla async, ale neobsahovala await.
+        // Pokud zde není ádná asynchronní operace, zmìòte na synchronní metodu:
+        // Pokud nìkdy budete potøebovat await, vrate zpìt na async.
 
         // sníení kapacity: nesmí “odøíznout” obsazenı slot
-        if (newCapacity < oldCapacity)
+        if (newCapacity < row.Capacity)
         {
             // sloty s PositionIndex >= newCapacity by zmizely
             var wouldRemove = row.Slots.Where(s => s.PositionIndex >= newCapacity).ToList();
             if (wouldRemove.Any(s => s.State == PalletState.Occupied))
             {
                 ErrorMessage = $"Nelze sníit kapacitu '{row.Name}' na {newCapacity} – nad novou kapacitou jsou obsazené sloty.";
-                return false;
+                return Task.FromResult(false);
             }
 
             _db.PalletSlots.RemoveRange(wouldRemove);
             row.Capacity = newCapacity;
-            return true;
+            return Task.FromResult(true);
         }
 
         // zvıšení kapacity: pøidáme nové sloty
-        if (newCapacity > oldCapacity)
+        if (newCapacity > row.Capacity)
         {
             var existingIndexes = row.Slots.Select(s => s.PositionIndex).ToHashSet();
 
@@ -597,9 +599,9 @@ public class SkladnikSettingsModel : PageModel
 
             _db.PalletSlots.AddRange(toAdd);
             row.Capacity = newCapacity;
-            return true;
+            return Task.FromResult(true);
         }
 
-        return true;
+        return Task.FromResult(true);
     }
 }

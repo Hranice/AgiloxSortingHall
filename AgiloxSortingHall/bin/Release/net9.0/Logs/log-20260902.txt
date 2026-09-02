@@ -1,0 +1,11 @@
+2026-09-02 06:21:46.388 +02:00 [INF] Starting AgiloxSortingHall application...
+2026-09-02 06:21:46.893 +02:00 [INF] Base path: C:\Users\rlhotak\DevelopmentEnv\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\
+2026-09-02 06:21:46.895 +02:00 [INF] Logs path: C:\Users\rlhotak\DevelopmentEnv\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\Logs\log-.txt
+2026-09-02 06:21:47.546 +02:00 [INF] SQLite database path: C:\Users\rlhotak\DevelopmentEnv\AgiloxSortingHall\AgiloxSortingHall\bin\Release\net9.0\agilox.db
+2026-09-02 06:21:48.254 +02:00 [INF] Database exists before migration: false
+2026-09-02 06:21:49.430 +02:00 [WRN] The migration operation 'PRAGMA foreign_keys = 0;
+' from migration 'AddPickedSlotToRowCall' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+2026-09-02 06:21:49.443 +02:00 [INF] Database did not exist before migration. Checking whether seed is needed...
+2026-09-02 06:21:49.609 +02:00 [INF] Seeding initial data...
+2026-09-02 06:21:49.958 +02:00 [INF] Initial data seeded successfully.
+2026-09-02 06:21:50.327 +02:00 [INF] AgiloxSortingHall application started.

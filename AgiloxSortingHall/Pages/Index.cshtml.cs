@@ -174,6 +174,22 @@ namespace AgiloxSortingHall.Pages
 
             object destination;
 
+            if (forceDestinationToBuffer || table.Category == WorkTableCategory.Kontrola2)
+            {
+                // finální cesta do oblasti Hotovo
+                destination = await SelectRowNamesForDropAsync();
+            }
+            else if (table.Category == WorkTableCategory.Kontrola)
+            {
+                destination = "Kontrola2";
+            }
+            else
+            {
+                destination = "Kontrola";
+            }
+
+            // Původní kód 
+            /*
             if (forceDestinationToBuffer || table.Category == WorkTableCategory.Kontrola)
             {
                 var selectedRowNames = await SelectRowNamesForDropAsync();
@@ -194,6 +210,7 @@ namespace AgiloxSortingHall.Pages
             {
                 destination = "Kontrola";
             }
+            */
 
             var call = new RowCall
             {

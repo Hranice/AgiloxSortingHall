@@ -109,12 +109,12 @@
                 <div class="bg-dark text-light border border-secondary rounded-3
                                     table-selection-card text-start d-flex flex-column shadow-sm
                                     js-table-card"
-                         data-url="@(
-                         table.Category != WorkTableCategory.Kontrola
-                         || hasPending
-                             ? detailUrl
-                             : null
-                                                  )">
+                         @* data-url: Kontrola i Kontrola2 bez pending callu nejsou klikatelné *@
+                        data-url="@(
+                            (table.Category != WorkTableCategory.Kontrola && table.Category != WorkTableCategory.Kontrola2) || hasPending
+                                ? detailUrl
+                                : null
+                        )">
 
                     <div class="table-card-layout">
 
@@ -228,7 +228,8 @@
                                     </form>
 
                                     <!-- Tlačítko odvézt prázdnou paletu -->
-                                    @if (table.Category != WorkTableCategory.Kontrola)
+                                    @* Prázdná paleta jen pro "normální" pracovní stoly (ne Kontrola, ne Kontrola2) *@
+                                    @if (table.Category != WorkTableCategory.Kontrola && table.Category != WorkTableCategory.Kontrola2)
                                     {
                                         <form method="post"
                                               asp-page-handler="EmptyPalette"

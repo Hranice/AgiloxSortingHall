@@ -3961,23 +3961,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\jprochazka\\.nuget\\packages\\": {},
+    "C:\\Users\\rlhotak\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\AgiloxSortingHall.csproj",
+      "projectUniqueName": "C:\\Users\\rlhotak\\DevelopmentEnv\\AgiloxSortingHall\\AgiloxSortingHall\\AgiloxSortingHall.csproj",
       "projectName": "AgiloxSortingHall",
-      "projectPath": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\AgiloxSortingHall.csproj",
-      "packagesPath": "C:\\Users\\jprochazka\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jprochazka\\source\\repos\\AgiloxSortingHall\\AgiloxSortingHall\\obj\\",
+      "projectPath": "C:\\Users\\rlhotak\\DevelopmentEnv\\AgiloxSortingHall\\AgiloxSortingHall\\AgiloxSortingHall.csproj",
+      "packagesPath": "C:\\Users\\rlhotak\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\rlhotak\\DevelopmentEnv\\AgiloxSortingHall\\AgiloxSortingHall\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\jprochazka\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\rlhotak\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -3986,7 +3986,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\jprochazka\\OneDrive - HEINZ-GLAS GmbH & Co. KGaA\\Dokumenty\\nupkg": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4075,7 +4074,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.314/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.317/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
